@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 /** Every page renders, shows its key copy, and logs no console errors. Screenshots land in e2e/screenshots. */
 const pages = [
-  { path: "/?demo=1", text: "Shareholder records are not", name: "landing" },
+  { path: "/?demo=1", text: "Tokenized stocks are composable", name: "landing" },
   { path: "/holder?demo=1", text: "Your positions, resolved", name: "holder" },
   { path: "/issuer?demo=1", text: "Registrar console", name: "issuer" },
   { path: "/actions?demo=1", text: "Actions", name: "actions" }
@@ -15,8 +15,9 @@ for (const p of pages) {
       if (m.type() === "error" && !/favicon|hydrat|Failed to fetch|net::ERR|404/i.test(m.text())) errors.push(m.text());
     });
     await page.goto(p.path);
-    await expect(page.getByText(p.text).first()).toBeVisible();
-    await page.waitForTimeout(1500);
+    await expect(page.getByRole("heading", { level: 1 }).filter({ hasText: p.text })).toBeVisible();
+    if (p.name === "holder") await page.locator("table.ledger, [role=alert]").first().waitFor({ timeout: 55_000 });
+    await page.waitForTimeout(1800);
     await page.screenshot({ path: `e2e/screenshots/${p.name}-${testInfo.project.name}.png`, fullPage: true });
     expect(errors, errors.join("\n")).toEqual([]);
   });

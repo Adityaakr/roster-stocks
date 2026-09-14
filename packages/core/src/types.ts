@@ -61,6 +61,8 @@ export interface ChainReader {
   getAccount(pubkey: Base58): Promise<RawAccount | null>;
   getMultipleAccounts(pubkeys: Base58[], dataSlice?: { offset: number; length: number }): Promise<(RawAccount | null)[]>;
   getProgramAccounts(programId: Base58, filters: AccountFilter[], dataSlice?: { offset: number; length: number }): Promise<RawAccount[]>;
+  /** Token accounts owned by `owner` under one token program (the indexed RPC path; cheap, and the fork merges local writes). */
+  getTokenAccountsByOwner(owner: Base58, tokenProgram: Base58): Promise<RawAccount[]>;
 }
 
 export interface MultiplierInfo {

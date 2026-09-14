@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 export interface Segment {
   label: string;
@@ -23,24 +23,21 @@ export function SupplyMap({ segments, hiddenPct, symbol }: { segments: Segment[]
   const reduce = useReducedMotion();
   const [animated, setAnimated] = useState(false);
   const [count, setCount] = useState(reduce ? hiddenPct : 0);
-  const ran = useRef(false);
 
   useEffect(() => {
-    if (ran.current) return;
-    ran.current = true;
+    // Runs once per session. React's dev StrictMode mounts twice, so the "seen" flag is set when the run completes,
+    // and the cleanup cancels a run that was interrupted.
     let seen = false;
     try {
       seen = sessionStorage.getItem(`lt.supplymap.${symbol}`) === "1";
-      sessionStorage.setItem(`lt.supplymap.${symbol}`, "1");
     } catch {
       seen = false;
     }
+    setAnimated(true);
     if (reduce || seen) {
-      setAnimated(true);
       setCount(hiddenPct);
       return;
     }
-    setAnimated(true);
     let raf = 0;
     const t = setTimeout(() => {
       const start = performance.now();
@@ -49,7 +46,14 @@ export function SupplyMap({ segments, hiddenPct, symbol }: { segments: Segment[]
         const eased = 1 - Math.pow(1 - k, 3);
         setCount(hiddenPct * eased);
         if (k < 1) raf = requestAnimationFrame(step);
-        else setCount(hiddenPct);
+        else {
+          setCount(hiddenPct);
+          try {
+            sessionStorage.setItem(`lt.supplymap.${symbol}`, "1");
+          } catch {
+            // ignore
+          }
+        }
       };
       raf = requestAnimationFrame(step);
     }, 700);

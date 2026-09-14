@@ -216,9 +216,8 @@ export default function IssuerPage() {
                   </tbody>
                 </table>
               ) : null}
-              <div className="flex items-center gap-3">
-                <label className="text-[14px] text-ink-2">Mint in scope</label>
-                <input className="flex-1 max-w-[520px] h-10 px-3 rounded-[10px] border border-line bg-surface num text-[13px]" value={mint} onChange={(e) => setMint(e.target.value)} aria-label="Mint address" />
+              <div className="flex flex-wrap items-center gap-3">
+                <input className="flex-1 min-w-[240px] max-w-[520px] h-10 px-3 rounded-[10px] border border-line bg-surface num text-[13px]" value={mint} onChange={(e) => setMint(e.target.value)} placeholder="Mint in scope" aria-label="Mint in scope" />
                 <button className="btn btn-primary" onClick={() => setStep(2)}>Continue</button>
               </div>
               <p className="text-[13px] text-ink-3">Tier labels come from tokens.xyz and are informational, never legal advice. Only Raydium CLMM and Kamino Lend positions are looked through in v1; other programs stay unattributed and labelled.</p>

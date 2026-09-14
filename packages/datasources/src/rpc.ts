@@ -85,6 +85,11 @@ export class RpcReader implements ChainReader {
     return out;
   }
 
+  async getTokenAccountsByOwner(owner: Base58, tokenProgram: Base58): Promise<RawAccount[]> {
+    const res = await withRetry(() => this.connection.getTokenAccountsByOwner(new PublicKey(owner), { programId: new PublicKey(tokenProgram) }, this.commitment), "getTokenAccountsByOwner", this.log);
+    return res.value.map(({ pubkey, account }) => toRaw(pubkey.toBase58(), account) as RawAccount);
+  }
+
   async getProgramAccounts(programId: Base58, filters: AccountFilter[], dataSlice?: { offset: number; length: number }): Promise<RawAccount[]> {
     const run = async (conn: Connection) => {
       const res = await conn.getProgramAccounts(new PublicKey(programId), {
@@ -151,6 +156,9 @@ export class RecordingReader implements ChainReader {
       v.map(serialiseAccount)
     );
   }
+  getTokenAccountsByOwner(owner: Base58, tokenProgram: Base58) {
+    return this.record("getTokenAccountsByOwner", [owner, tokenProgram], () => this.inner.getTokenAccountsByOwner(owner, tokenProgram), (v) => v.map(serialiseAccount));
+  }
 }
 
 export class ReplayReader implements ChainReader {
@@ -174,6 +182,9 @@ export class ReplayReader implements ChainReader {
   }
   async getProgramAccounts(programId: Base58, filters: AccountFilter[], dataSlice?: { offset: number; length: number }) {
     return this.lookup<unknown[]>("getProgramAccounts", [programId, filters, dataSlice ?? null]).map((v) => deserialiseAccount(v) as RawAccount);
+  }
+  async getTokenAccountsByOwner(owner: Base58, tokenProgram: Base58) {
+    return this.lookup<unknown[]>("getTokenAccountsByOwner", [owner, tokenProgram]).map((v) => deserialiseAccount(v) as RawAccount);
   }
 }
 

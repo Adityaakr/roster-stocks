@@ -32,7 +32,7 @@ export function Header() {
 
   return (
     <header className="w-full border-b border-line bg-surface">
-      <div className="max-w-[1120px] mx-auto px-4 sm:px-6 h-14 flex items-center gap-4">
+      <div className="max-w-[1120px] mx-auto px-4 sm:px-6 h-14 flex items-center gap-3 min-w-0">
         <Link href="/" className="font-semibold tracking-tight text-[16px]">
           Lookthrough
         </Link>
@@ -41,19 +41,21 @@ export function Header() {
           <Link href="/issuer" className="hover:text-ink">Issuer</Link>
           <Link href="/actions" className="hover:text-ink">Actions</Link>
         </nav>
-        <div className="ml-auto flex items-center gap-3">
+        <div className="ml-auto flex items-center gap-2 min-w-0">
           {session ? (
-            <span className="chip" title="From Backpack market sessions and holidays">
-              <span className={`inline-block w-2 h-2 rounded-full ${session.open ? "bg-accent" : "bg-ink-3"}`} aria-hidden />
-              US market {session.open ? "open" : "closed"}
+            <span className="hidden sm:block">
+              <span className="chip" title="From Backpack market sessions and holidays">
+                <span className={`inline-block w-2 h-2 rounded-full ${session.open ? "bg-accent" : "bg-ink-3"}`} aria-hidden />
+                US market {session.open ? "open" : "closed"}
+              </span>
             </span>
           ) : null}
           {demo.enabled ? (
-            <label className="chip gap-2">
+            <label className="chip gap-2 min-w-0 max-w-[60vw] sm:max-w-none">
               <span className="sr-only">Demo wallet</span>
               <select
                 aria-label="Demo wallet"
-                className="bg-transparent outline-none"
+                className="bg-transparent outline-none min-w-0 max-w-full truncate"
                 value={demo.selected ?? ""}
                 onChange={(e) => demo.select((e.target.value || null) as never)}
               >

@@ -87,6 +87,9 @@ class FakeChain {
       return null;
     });
   }
+  async getTokenAccountsByOwner(): Promise<RawAccount[]> {
+    return [];
+  }
   async getProgramAccounts(programId: string, filters: { memcmp?: { offset: number; bytes: string }; dataSize?: number }[]) {
     if (programId === TOKEN_PROGRAM) return balances.map(([pk, owner, amt]) => acc(pk, new PublicKey(TOKEN_PROGRAM), tokenAccount(owner, amt)));
     if (programId === RAYDIUM_CLMM_PROGRAM) {

@@ -6,9 +6,10 @@
 import { PublicKey } from "@solana/web3.js";
 import BN from "bn.js";
 import { CLMM_PROGRAM_ID, LiquidityMathUtil, PersonalPositionLayout, PoolInfoLayout, TickUtil, getPdaPersonalPositionAddress } from "@raydium-io/raydium-sdk-v2";
-import { Obligation, Reserve } from "@kamino-finance/klend-sdk";
+import { Obligation, PROGRAM_ID as KLEND_PROGRAM_ID_ADDR, Reserve, VanillaObligation } from "@kamino-finance/klend-sdk";
+import { address } from "@solana/kit";
 import { KAMINO_LEND_PROGRAM, RAYDIUM_CLMM_PROGRAM, TOKEN_2022_PROGRAM, TOKEN_PROGRAM, rawToShares6, type Base58, type ChainReader, type MintInfo } from "@lookthrough/core";
-import { KaminoLendAdapter, OBLIGATION_OFFSETS, OBLIGATION_SIZE, POOL_STATE_SPAN, RESERVE_OFFSETS, RESERVE_SPAN, RaydiumClmmAdapter } from "@lookthrough/adapters";
+import { KaminoLendAdapter, OBLIGATION_SIZE, POOL_STATE_SPAN, RESERVE_OFFSETS, RESERVE_SPAN, RaydiumClmmAdapter } from "@lookthrough/adapters";
 import { readMintInfo } from "@lookthrough/datasources";
 
 export interface LedgerRow {
@@ -34,6 +35,16 @@ export interface WalletLedger {
 }
 
 const pk = (d: Uint8Array, o: number) => new PublicKey(d.subarray(o, o + 32)).toBase58();
+
+/** Reserve discovery is a program-wide scan (slow through an RPC proxy) and its result changes rarely: memoise for 10 minutes. */
+const reserveCache = new Map<string, { keys: string[]; at: number }>();
+async function reservesForMint(reader: ChainReader, mint: Base58): Promise<string[]> {
+  const hit = reserveCache.get(mint);
+  if (hit && Date.now() - hit.at < 10 * 60_000) return hit.keys;
+  const keys = (await reader.getProgramAccounts(KAMINO_LEND_PROGRAM, [{ dataSize: RESERVE_SPAN }, { memcmp: { offset: RESERVE_OFFSETS.liquidityMint, bytes: mint } }], { offset: 0, length: 0 })).map((r) => r.pubkey);
+  reserveCache.set(mint, { keys, at: Date.now() });
+  return keys;
+}
 const amountAt64 = (d: Uint8Array) => new DataView(d.buffer, d.byteOffset + 64, 8).getBigUint64(0, true);
 
 export async function resolveWallet(reader: ChainReader, wallet: Base58, mint: Base58): Promise<WalletLedger> {
@@ -43,19 +54,15 @@ export async function resolveWallet(reader: ChainReader, wallet: Base58, mint: B
   const shares = (raw: bigint) => rawToShares6(raw, mintInfo.multiplier.multiplier, mintInfo.decimals);
   const rows: LedgerRow[] = [];
 
-  // Direct: token accounts of the mint owned by the wallet.
-  const direct = await reader.getProgramAccounts(mintInfo.tokenProgram, [{ memcmp: { offset: 0, bytes: mint } }, { memcmp: { offset: 32, bytes: wallet } }], { offset: 0, length: 72 });
-  for (const a of direct) {
-    const raw = amountAt64(a.data);
-    if (raw === 0n) continue;
-    rows.push({ source: "direct", container: a.pubkey, label: "Wallet balance", rawAmount: raw, shares6: shares(raw), estimated: false, evidence: { tokenAccount: a.pubkey, rawAmount: raw.toString(), multiplier: mintInfo.multiplier.multiplier } });
-  }
-
-  // Raydium: NFTs held by the wallet (amount 1) whose mint has a personal position in a pool of this mint.
+  // Everything the wallet holds under both token programs: direct balances of the mint, and NFT candidates.
+  const held = [...(await reader.getTokenAccountsByOwner(wallet, TOKEN_2022_PROGRAM)), ...(await reader.getTokenAccountsByOwner(wallet, TOKEN_PROGRAM))];
   const nftCandidates: { mint: Base58; tokenAccount: Base58 }[] = [];
-  for (const program of [TOKEN_2022_PROGRAM, TOKEN_PROGRAM]) {
-    const held = await reader.getProgramAccounts(program, [{ memcmp: { offset: 32, bytes: wallet } }], { offset: 0, length: 72 });
-    for (const a of held) if (amountAt64(a.data) === 1n) nftCandidates.push({ mint: pk(a.data, 0), tokenAccount: a.pubkey });
+  for (const a of held) {
+    const m = pk(a.data, 0);
+    const raw = amountAt64(a.data);
+    if (m === mint && raw > 0n) {
+      rows.push({ source: "direct", container: a.pubkey, label: "Wallet balance", rawAmount: raw, shares6: shares(raw), estimated: false, evidence: { tokenAccount: a.pubkey, rawAmount: raw.toString(), multiplier: mintInfo.multiplier.multiplier } });
+    } else if (raw === 1n) nftCandidates.push({ mint: m, tokenAccount: a.pubkey });
   }
   if (nftCandidates.length) {
     const posAddrs = nftCandidates.map((c) => getPdaPersonalPositionAddress(CLMM_PROGRAM_ID, new PublicKey(c.mint)).publicKey.toBase58());
@@ -85,11 +92,18 @@ export async function resolveWallet(reader: ChainReader, wallet: Base58, mint: B
     }
   }
 
-  // Kamino: obligations owned by the wallet with deposits in reserves of this mint.
-  const reserves = await reader.getProgramAccounts(KAMINO_LEND_PROGRAM, [{ dataSize: RESERVE_SPAN }, { memcmp: { offset: RESERVE_OFFSETS.liquidityMint, bytes: mint } }]);
+  // Kamino: the wallet's vanilla obligation in each market that has a reserve for this mint (derived address, one read each).
+  // The record-date snapshot enumerates every obligation type; the live ledger reads the vanilla one, which is what deposits create.
+  // Discovery with a data slice (cheap through an RPC proxy), then point reads for the full reserve state.
+  const reserveKeys = await reservesForMint(reader, mint);
+  const reserveAccs = reserveKeys.length ? await reader.getMultipleAccounts(reserveKeys) : [];
+  const reserves = reserveAccs.flatMap((acc, i) => (acc ? [{ pubkey: reserveKeys[i] as string, data: acc.data }] : []));
   if (reserves.length) {
     const byReserve = new Map(reserves.map((r) => [r.pubkey, Reserve.decode(Buffer.from(r.data))]));
-    const obligations = await reader.getProgramAccounts(KAMINO_LEND_PROGRAM, [{ dataSize: OBLIGATION_SIZE }, { memcmp: { offset: OBLIGATION_OFFSETS.owner, bytes: wallet } }]);
+    const markets = [...new Set([...byReserve.values()].map((r) => r.lendingMarket.toString()))];
+    const pdas = await Promise.all(markets.map((m) => new VanillaObligation(KLEND_PROGRAM_ID_ADDR).toPda(address(m), address(wallet))));
+    const obligationAccs = await reader.getMultipleAccounts(pdas.map(String));
+    const obligations = obligationAccs.flatMap((acc, i) => (acc && acc.owner === KAMINO_LEND_PROGRAM && acc.data.length === OBLIGATION_SIZE ? [{ pubkey: String(pdas[i]), data: acc.data }] : []));
     for (const o of obligations) {
       const ob = Obligation.decode(Buffer.from(o.data));
       for (const d of ob.deposits) {

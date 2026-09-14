@@ -216,9 +216,7 @@ export default function HolderPage() {
                   ))}
                   <motion.tr initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: rows.length * stagger + 0.1 }}>
                     <td className="font-medium">Total</td>
-                    <td className="text-ink-2 text-[13px]">
-                      multiplier <span className="num">{data.ledger.multiplier}</span>, slot <span className="num">{slotLabel(data.ledger.slot)}</span>
-                    </td>
+                    <td />
                     <td className="num font-medium">
                       <CountUp value={total} reduce={!!reduce} />
                     </td>
@@ -236,7 +234,7 @@ export default function HolderPage() {
             <div className="px-4 py-3 text-[13px] text-ink-3 border-t border-line">
               A wallet scan sees <span className="num text-ink">{shares(visible)}</span> of <span className="num text-ink">{shares(total)}</span> share equivalents ({pct(visible, total)}%).
               {hasEstimate ? " Rows marked estimated use current pool and reserve state; the record-date snapshot applies accrued fees and the pool-wide reconciliation, and it is the number that counts." : ""}
-              {" "}Read at {timeLabel(data.ledger.timestamp)}.
+              {" "}Read at slot <span className="num">{slotLabel(data.ledger.slot)}</span>, {timeLabel(data.ledger.timestamp)}, multiplier <span className="num">{data.ledger.multiplier}</span>.
             </div>
           </div>
         ) : null}
@@ -255,7 +253,9 @@ export default function HolderPage() {
               const pay = a.amountPerShareMicro ? (ent * BigInt(a.amountPerShareMicro)) / 1_000_000n : 0n;
               const claimed = a.receipt && a.kind === "distribution";
               const voted = a.receipt && a.kind === "vote";
-              const open = a.status === "funded" || a.status === "open";
+              const regSlot = data.registration.registered ? BigInt(data.registration.slot ?? "0") : null;
+              const lateRegistration = regSlot === null || regSlot > BigInt(a.snapshotSlot);
+              const open = (a.status === "funded" || a.status === "open") && !lateRegistration;
               return (
                 <li key={a.id} className="panel p-5">
                   <div className="flex flex-wrap items-start justify-between gap-4">
@@ -266,7 +266,7 @@ export default function HolderPage() {
                       </div>
                       <div className="text-[13px] text-ink-2 mt-1">
                         {a.inTree ? (
-                          <>Your entitlement at the record date: <span className="num text-ink">{shares(ent)}</span> shares{data.registration.registered ? "" : " (registered after the snapshot: not claimable)"}</>
+                          <>Your entitlement at the record date: <span className="num text-ink">{shares(ent)}</span> shares{lateRegistration ? ". This wallet registered after the record slot, so the program will not accept a claim or vote on this action." : ""}</>
                         ) : (
                           "You are not in this tree (not registered at the record date, or no exposure)."
                         )}

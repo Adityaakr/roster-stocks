@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { store } from "@/lib/server";
-import { shares, short, slotLabel } from "@/lib/format";
+import { shares, slotLabel } from "@/lib/format";
 import { Empty } from "@/components/states";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +20,7 @@ export default function ActionsPage() {
         <div className="mt-6 panel overflow-x-auto">
           <table className="ledger w-full text-[14px]">
             <thead>
-              <tr><th>Action</th><th>Kind</th><th>Status</th><th className="num">Record slot</th><th className="num">Attributed</th><th className="num">Leaves</th><th className="num">Total shares</th><th>Root</th></tr>
+              <tr><th>Action</th><th>Kind</th><th>Status</th><th className="num">Record slot</th><th className="num">Attributed</th><th className="num">Leaves</th><th className="num">Total shares</th></tr>
             </thead>
             <tbody>
               {actions.map((a) => (
@@ -32,7 +32,6 @@ export default function ActionsPage() {
                   <td className="num">{a.snapshot ? `${a.snapshot.attributedPct}%` : "…"}</td>
                   <td className="num">{a.snapshot?.leaves ?? "…"}</td>
                   <td className="num">{a.snapshot ? shares(a.snapshot.totalEntitlement) : "…"}</td>
-                  <td className="num">{a.snapshot ? short(a.snapshot.root, 6) : "…"}</td>
                 </tr>
               ))}
             </tbody>

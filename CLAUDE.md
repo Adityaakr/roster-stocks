@@ -80,19 +80,15 @@ Anchor program `lookthrough`: PDAs `["reg", mint, wallet]`, `["action", action_i
 
 ## How to run (kept current)
 
-- Fork: `pnpm fork` (wraps `scripts/fork.sh`, port 8899, datasource `MAINNET_RPC_URL` or public mainnet).
-- Verify: `pnpm verify`.
-- Demo keypairs: `.keys/` (gitignored), created by `pnpm seed`.
-
-## Probe findings from Phase 1 and 2 (2026-09-14 to 15)
-
-- AAPLx mainnet fixture at slot 447038097: 62,070 token accounts, sum equals mint supply exactly (no warning), wallets hold 98.12% directly. Program-held: Kamino 0.89%, Raydium CLMM 0.51%, program `AjMx5My4YUDHMiCtLpTAtgkiUJgrpJnQqd5AcQnddHQW` 0.27% (no Anchor IDL, labelled "other programs"), System-owned PDAs 0.11%, owners without accounts 0.07%. SPYx at slot 447038453: 156,328 accounts, wallets 69.64%, program `6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P` 20.21% (on-chain Anchor IDL name "pump"), Kamino 5.55%, Raydium 3.97%.
-- Raydium pool `CKwJZ…` probe: 215 positions, vault 21.75 B raw; position amounts 21.29 B, owed fees 3.2 M, accrued (uncollected) fees 620 M, protocol 0.19 M, fund 0.86 M. Accrued fees are 2.9% of the vault, so the adapter computes them from tick arrays (`PositionUtils.GetPositionFees`). Reads are not atomic on mainnet, so the sum can differ from the vault by ±1%; the pro rata step to `vault − protocol − fund fees` absorbs it and dust goes to an unattributed row.
-- Kamino AAPLx reserve probe: 293 obligations; `Σ depositedAmount` == cTokens in `collateral.supplyVault` == 138,324,471,773; `mintTotalSupply` 138,324,571,773 (100,000 cTokens unenumerated); zero wallet-held cTokens; `config.borrowLimit` 0. Obligation account size is `Obligation.layout.span + 8` = 3344 (the codegen layout excludes the discriminator); filters: memcmp 32 = lendingMarket and memcmp 96 + 136·i = reserve.
-- On the fork: `surfnet_setTokenAccount` after a real ATA creation REPLACES the account with a 165-byte one (extensions dropped) and the balance set; Raydium `openPositionFromBase` (single-sided, `nft2022: true`, `TxVersion.V0`) and Kamino `buildDepositTxns` (split into a setup tx and a refresh + deposit tx, `initUserMetadata.skipLutCreation: true` because the SDK's LUT is created in the same tx and cannot be fetched) both succeed from that account. Kamino deposit of 4,000,000,000 raw minted 4,000,000,000 cTokens (rate 1:1) and the rule attributes exactly that.
-- surfpool quirk: the first time a datasource-proxied account is returned by getProgramAccounts with `dataSlice`, the data can be the FULL account; later reads honour the slice. Adapters detect the full span and read absolute offsets.
-- surfpool forwards `getTokenLargestAccounts` and `getTokenAccountsByOwner`+mint to the datasource even for locally created mints (Internal error when the datasource 429s). Use getProgramAccounts with a memcmp on the mint for holder lookups; the fork answers those for local accounts.
-- Rate limits are the bottleneck: public mainnet enforces a per-method budget (~10 s window, "Too many requests for a specific RPC call"); Alchemy free tier rejects large getProgramAccounts by compute units. Reader policy: primary first, fallback per call, backoff in seconds, holder lookups at concurrency 2. Never run two heavy jobs at once. Hermetic demo path: `surfpool start --offline --snapshot <file>` from a `surfnet_exportSnapshot {"scope":"network"}` taken after one complete run.
+- Fork: `pnpm fork` (surfpool on 127.0.0.1:8899, datasource public mainnet or `FORK_DATASOURCE_URL`). Creates `.keys/registrar.json` on first run.
+- Program: `pnpm anchor:build` (sbpf v0, syncs the IDL into `packages/sdk/src/idl`), `pnpm anchor:deploy` (to the fork).
+- Seed: `pnpm seed` (Alice, Bob, Carol under `.keys/`, positions opened on the fork, `.keys/demo.json` and `.keys/registry.json`).
+- Demo: `pnpm demo` (five scenes, checklist with signatures) or `pnpm test:e2e`. A snapshot on the fork takes 5 to 15 minutes.
+- Registrar CLI: `pnpm registrar <schedule|snapshot|register|publish|fund|claim|vote|proof|tally> …`.
+- Web: `pnpm --filter @lookthrough/web dev`, then http://localhost:3000/?demo=1. `DEMO_MODE=1` in `.env` enables the server-signed demo wallets and the issuer console.
+- Verify: `pnpm verify` = typecheck, lint, unit tests (incl. the AAPLx fixture invariant test and Merkle vectors), litesvm program tests, Playwright smoke (skipped when the web app is not running).
+- Fixtures: `pnpm fixtures:capture <mint> <symbol>` (10 to 20 minutes against public mainnet), `pnpm visibility <mint> <symbol> [--fixture file]`, `pnpm merkle:vectors`.
+- Probes worth keeping: `scripts/probes/*.ts` (Raydium pool accounting, Kamino reserve accounting, fork position and deposit, ledger profile).
 
 ## Known gotchas
 
