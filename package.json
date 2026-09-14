@@ -1,0 +1,31 @@
+{
+  "name": "lookthrough",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@11.23.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "fork": "bash scripts/fork.sh",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:anchor": "bash scripts/anchor-test.sh",
+    "test:e2e": "vitest run --project e2e",
+    "verify": "pnpm typecheck && pnpm lint && pnpm test && pnpm test:anchor",
+    "probe": "tsx scripts/probe.ts"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@lookthrough/datasources": "workspace:*",
+    "@types/node": "^22.19.0",
+    "dotenv": "^17.2.0",
+    "eslint": "^9.39.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "typescript-eslint": "^8.46.0",
+    "vitest": "5.0.0"
+  },
+  "type": "module"
+}

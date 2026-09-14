@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": { "noEmit": true, "types": ["node"], "paths": { "@lookthrough/*": ["./packages/*/src/index.ts"] } },
+  "include": ["scripts", "tests", "vitest.config.ts", "eslint.config.js"]
+}
