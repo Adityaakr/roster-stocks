@@ -1,51 +1,93 @@
 {
   "mint": "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
   "symbol": "AAPLx",
-  "slot": 447038097,
-  "timestamp": 1789408337,
+  "slot": 447052243,
+  "timestamp": 1789412811,
   "decimals": 8,
   "multiplier": "1.0032690125398187",
-  "supplyRaw": "15376355897175",
-  "accountsRaw": "15376355897175",
-  "accountsScanned": 62070,
-  "walletVisibleRaw": "15088027629490",
-  "programHeldRaw": "288328267685",
-  "programHeldPct": "1.87",
+  "supplyRaw": "15376355589953",
+  "accountsRaw": "15376355589953",
+  "accountsScanned": 61972,
+  "walletVisibleRaw": "15085869328659",
+  "programHeldRaw": "290486261294",
+  "programHeldPct": "1.88",
   "breakdownByProgram": [
     {
       "label": "Kamino Lend",
       "program": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
-      "raw": "138324571773",
+      "raw": "138210799451",
       "pct": "0.89",
       "accounts": 1
     },
     {
       "label": "Raydium CLMM",
       "program": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
-      "raw": "79080626503",
-      "pct": "0.51",
+      "raw": "80509718126",
+      "pct": "0.52",
       "accounts": 180
     },
     {
-      "label": "other programs",
-      "program": "AjMx5My4YUDHMiCtLpTAtgkiUJgrpJnQqd5AcQnddHQW",
-      "raw": "41575022649",
-      "pct": "0.27",
-      "accounts": 7297
+      "label": "other programs (on-chain IDL name: byreal_clmm)",
+      "program": "REALQqNEomY6cQGZJUGwywTBD2UmDT32rZcNnfxQ5N2",
+      "raw": "17984210217",
+      "pct": "0.11",
+      "accounts": 2
     },
     {
       "label": "other programs (PDA holding lamports only)",
       "program": "11111111111111111111111111111111",
-      "raw": "17625634867",
+      "raw": "16960402628",
       "pct": "0.11",
-      "accounts": 671
+      "accounts": 674
     },
     {
       "label": "other programs (owner has no account)",
       "program": null,
-      "raw": "11256110792",
+      "raw": "10949831149",
       "pct": "0.07",
-      "accounts": 3704
+      "accounts": 3638
+    },
+    {
+      "label": "other programs (on-chain IDL name: whirlpool)",
+      "program": "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc",
+      "raw": "10431748167",
+      "pct": "0.06",
+      "accounts": 24
+    },
+    {
+      "label": "other programs",
+      "program": "AjMx5My4YUDHMiCtLpTAtgkiUJgrpJnQqd5AcQnddHQW",
+      "raw": "7865440233",
+      "pct": "0.05",
+      "accounts": 2502
+    },
+    {
+      "label": "other programs (on-chain IDL name: lb_clmm)",
+      "program": "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo",
+      "raw": "2139687443",
+      "pct": "0.01",
+      "accounts": 24
+    },
+    {
+      "label": "other programs (on-chain IDL name: pump)",
+      "program": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+      "raw": "1957129014",
+      "pct": "0.01",
+      "accounts": 4778
+    },
+    {
+      "label": "other programs (on-chain IDL name: nest_core)",
+      "program": "HxbLPNuQD7KKDVQoSQgY1cLMLrsaoseT65Xoczh7zHQW",
+      "raw": "1823754331",
+      "pct": "0.01",
+      "accounts": 2
+    },
+    {
+      "label": "other programs (on-chain IDL name: amm_v3)",
+      "program": "HpNfyc2Saw7RKkQd8nEL4khUcuPhQ7WwY1B2qjx8jxFq",
+      "raw": "676660618",
+      "pct": "0.00",
+      "accounts": 1
     },
     {
       "label": "Token-2022",
@@ -53,8 +95,106 @@
       "raw": "466301101",
       "pct": "0.00",
       "accounts": 8
+    },
+    {
+      "label": "other programs (on-chain IDL name: pump_amm)",
+      "program": "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA",
+      "raw": "272717756",
+      "pct": "0.00",
+      "accounts": 4
+    },
+    {
+      "label": "other programs (on-chain IDL name: loopscale)",
+      "program": "1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78",
+      "raw": "200000000",
+      "pct": "0.00",
+      "accounts": 1
+    },
+    {
+      "label": "other programs (on-chain IDL name: tokerate_gateway)",
+      "program": "7kyxtPeS8vdgSvunbzr9cWmh5YEc2Dk8YZLypRPgXr3Q",
+      "raw": "24119700",
+      "pct": "0.00",
+      "accounts": 1
+    },
+    {
+      "label": "other programs (on-chain IDL name: pump_fees)",
+      "program": "pfeeUxB6jkeY1Hxd7CsFCAjcbHA9rWtchMGdZ6VojVZ",
+      "raw": "6628354",
+      "pct": "0.00",
+      "accounts": 11
+    },
+    {
+      "label": "other programs (on-chain IDL name: referral)",
+      "program": "REFER4ZgmyYx9c6He5XfaTMiGfdLwRnkV4RPp9t9iF3",
+      "raw": "6470000",
+      "pct": "0.00",
+      "accounts": 26
+    },
+    {
+      "label": "other programs (on-chain IDL name: yield_vault)",
+      "program": "3VtzVhc9vFWb7GaV7TtbZ1nytGzqNsASShAHjiWEFp5s",
+      "raw": "530413",
+      "pct": "0.00",
+      "accounts": 1
+    },
+    {
+      "label": "other programs (on-chain IDL name: flipper)",
+      "program": "fLpRcgQSJxKeeUogb6M7bWe1iyYQbahjGXGwr4HgHit",
+      "raw": "85455",
+      "pct": "0.00",
+      "accounts": 2
+    },
+    {
+      "label": "other programs (on-chain IDL name: magpie_router)",
+      "program": "2DAtv2URAcb9ZHVMHEB8E3TFBTk9PoNSYknjq8DVr69c",
+      "raw": "27138",
+      "pct": "0.00",
+      "accounts": 1
+    },
+    {
+      "label": "other programs (on-chain IDL name: limit_order_2)",
+      "program": "j1o2qRpjcyUwEvwtcfhEQefh773ZgjxcVRry7LDqg5X",
+      "raw": "0",
+      "pct": "0.00",
+      "accounts": 1
+    },
+    {
+      "label": "other programs (on-chain IDL name: portfolio)",
+      "program": "avoFNjSqGJqbNDu417u64G2JxRjdwLc2Qu3rMwFojFZ",
+      "raw": "0",
+      "pct": "0.00",
+      "accounts": 1
+    },
+    {
+      "label": "other programs (on-chain IDL name: magic_trade)",
+      "program": "FTv2RxXarPfNta45HTTMVaGvjzsGg27FXJ3hEKWBhrzV",
+      "raw": "0",
+      "pct": "0.00",
+      "accounts": 1
+    },
+    {
+      "label": "other programs (on-chain IDL name: alphadex)",
+      "program": "H4CLnZWkTmuNGxjPhLN3vxQM9mi14u9gqhvaHQwLf6hy",
+      "raw": "0",
+      "pct": "0.00",
+      "accounts": 1
+    },
+    {
+      "label": "other programs (on-chain IDL name: perpetuals)",
+      "program": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn",
+      "raw": "0",
+      "pct": "0.00",
+      "accounts": 1
+    },
+    {
+      "label": "other programs (on-chain IDL name: malleable_etf)",
+      "program": "ETFnhMchhqNFRYbUXWABAsZXaU8Anm1wdRehKjzBPC4R",
+      "raw": "0",
+      "pct": "0.00",
+      "accounts": 1
     }
   ],
   "source": "fixture fixtures/accounts/AAPLx.json.gz",
-  "generatedAt": "2026-09-14T19:06:58.387Z"
+  "generatedAt": "2026-09-14T19:52:23.599Z"
 }

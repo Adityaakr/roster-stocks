@@ -4,7 +4,7 @@
 
 Tokenized stocks on Solana are composable: Raydium pools, Kamino reserves, baskets, vaults. Shareholder infrastructure is not. When a token enters a program, the program is the formal owner. At a record date an issuer looking at wallet balances cannot tell who is entitled.
 
-Read from mainnet on 2026-09-14: 30.35% of SPYx supply and 1.87% of AAPLx supply sit in programs, invisible to a wallet scan.
+Read from mainnet on 2026-09-14: 30.35% of SPYx supply and 1.88% of AAPLx supply sit in programs, invisible to a wallet scan.
 
 The two obvious fixes fail. Airdropping to token accounts pays vaults that cannot account for it. Forcing holders to withdraw for every record date drains liquidity. Malinova and Park (Research Policy, 2026) name this as the unresolved problem and propose an opt-in registry with a look-through into pool positions.
 

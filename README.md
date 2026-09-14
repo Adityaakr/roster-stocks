@@ -60,6 +60,7 @@ Tested on a recorded mainnet fixture and on every snapshot:
 - **Real:** the mints (AAPLx `XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp`, SPYx `XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W`) with their Token-2022 scaled UI amount extension, the Raydium CLMM pool `CKwJZwm7oj3nu4653N1EpDrqXbXAYXoPFiPeEnLouF8y`, the Kamino xStocks market reserve `CKJbqakbPGyhziowm19LPYz636UszuezfkitmpRtcLSH`, every other holder on mainnet, and the program running on a surfpool fork of mainnet.
 - **Simulated:** the issuer. A registrar keypair we operate publishes actions. The USDC distribution is funded by a demo wallet. Alice, Bob and Carol are local keypairs whose AAPLx balances were set with the fork's cheatcode (their Raydium and Kamino positions were then opened with real instructions, and the fork's recorded mint supply was raised by the seeded amount so the supply check stays honest).
 - **Lending scenario:** collateral-only. Nothing is borrowed from the AAPLx reserve, so "payment in lieu owed by borrowers" is zero and the UI never implies a live lending scenario.
+- **Supply warning on the fork:** the fork pins the AAPLx mint account locally (its supply was raised by the seeded amount) while it proxies every other account from live mainnet, so between a seed and a snapshot mainnet minting can make the token-account sum drift above the pinned supply by a few shares. The resolver reports this as a warning with the delta rather than hiding it; on the recorded mainnet fixtures the sum matches supply exactly.
 - **Snapshot semantics:** standard RPC cannot read state at a past slot. A record date is scheduled as a future slot; the resolver runs once that slot is reached and writes the slot it actually read into every leaf and the on-chain metadata. On the fork this is a consistent view. Against mainnet it is "a consistent view at or shortly after the record slot", and the path forward is an archival RPC that serves `getProgramAccounts` at a slot.
 - **The "100 shares" number:** the resolver returns what the rules produce. In the fork runs Alice resolved to 99.94 to 100.00 share equivalents depending on how far the pool state and the vault balance had drifted apart between two datasource reads; the UI shows six decimals and never rounds a figure to hide that.
 
@@ -69,7 +70,7 @@ Computed by `pnpm visibility <mint> <symbol>` from a full scan of every token ac
 
 | Mint | Slot | Token accounts | Held by programs | Of which |
 |---|---|---|---|---|
-| AAPLx | 447,038,097 | 62,070 | 1.87% | Kamino Lend 0.89%, Raydium CLMM 0.51%, other programs 0.47% |
+| AAPLx | 447,052,243 | 61,972 | 1.88% | Kamino Lend 0.89%, Raydium CLMM 0.52%, other programs 0.47% (largest: a program whose on-chain IDL is named byreal_clmm, 0.11%) |
 | SPYx | 447,038,453 | 156,328 | 30.35% | one program with on-chain IDL name "pump" 20.21%, Kamino Lend 5.55%, Raydium CLMM 3.97%, other 0.62% |
 
 For both mints the scanned token accounts sum exactly to the mint supply.
