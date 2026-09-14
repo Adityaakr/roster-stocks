@@ -4,7 +4,7 @@
  * Signed endpoints (mint and redeem) are not in the public docs on that date; see BackpackSecuritiesRail.
  */
 import { z } from "zod";
-import { HttpClient } from "./http.js";
+import { HttpClient } from "./http";
 
 export const BACKPACK_BASE_URL = "https://api.backpack.exchange";
 

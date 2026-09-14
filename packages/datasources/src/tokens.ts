@@ -4,7 +4,7 @@
  * Schemas are deliberately loose (unknown keys pass through) so a new optional field never breaks the app.
  */
 import { z } from "zod";
-import { HttpClient } from "./http.js";
+import { HttpClient } from "./http";
 
 export const TOKENS_BASE_URL = "https://api.tokens.xyz/v1";
 

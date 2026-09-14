@@ -1,0 +1,67 @@
+{
+  "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+  "symbol": "SPYx",
+  "slot": 447038453,
+  "timestamp": 1789408449,
+  "decimals": 8,
+  "multiplier": "1.005714560286254",
+  "supplyRaw": "9523198927035",
+  "accountsRaw": "9523198927035",
+  "accountsScanned": 156328,
+  "walletVisibleRaw": "6632022003009",
+  "programHeldRaw": "2891176924026",
+  "programHeldPct": "30.35",
+  "breakdownByProgram": [
+    {
+      "label": "other programs",
+      "program": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+      "raw": "1925494458818",
+      "pct": "20.21",
+      "accounts": 21161
+    },
+    {
+      "label": "Kamino Lend",
+      "program": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+      "raw": "528798638492",
+      "pct": "5.55",
+      "accounts": 2
+    },
+    {
+      "label": "Raydium CLMM",
+      "program": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+      "raw": "378458595068",
+      "pct": "3.97",
+      "accounts": 570
+    },
+    {
+      "label": "other programs (PDA holding lamports only)",
+      "program": "11111111111111111111111111111111",
+      "raw": "47276062724",
+      "pct": "0.49",
+      "accounts": 1260
+    },
+    {
+      "label": "other programs (owner has no account)",
+      "program": null,
+      "raw": "8916361238",
+      "pct": "0.09",
+      "accounts": 15862
+    },
+    {
+      "label": "Token-2022",
+      "program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "raw": "2225286728",
+      "pct": "0.02",
+      "accounts": 10
+    },
+    {
+      "label": "SPL Token",
+      "program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+      "raw": "7520958",
+      "pct": "0.00",
+      "accounts": 1
+    }
+  ],
+  "source": "fixture fixtures/accounts/SPYx.json.gz",
+  "generatedAt": "2026-09-14T19:07:08.202Z"
+}

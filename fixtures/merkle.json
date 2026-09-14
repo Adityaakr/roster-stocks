@@ -1,0 +1,80 @@
+{
+  "note": "leaf = keccak256(0x00 || actionId || wallet || mint || slot u64 LE || entitlement u64 LE); node = keccak256(0x01 || min || max); odd node promoted",
+  "actionId": "d456e32bbc8d4582532057428a3098402362f9f77747cfadcafd4dccc5ec55b3",
+  "mint": "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+  "snapshotSlot": "446997808",
+  "entries": [
+    {
+      "wallet": "11111111111111111111111111111112",
+      "entitlement": "25000000"
+    },
+    {
+      "wallet": "So11111111111111111111111111111111111111112",
+      "entitlement": "100000000"
+    },
+    {
+      "wallet": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+      "entitlement": "1"
+    },
+    {
+      "wallet": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "entitlement": "18446744073709551615"
+    },
+    {
+      "wallet": "S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS",
+      "entitlement": "40326901"
+    }
+  ],
+  "root": "6b594f4c8f81684be9e19334293864351f6e24c86f8fa0724e78b417c37286ac",
+  "totalEntitlement": "18446744073874878517",
+  "leaves": [
+    {
+      "wallet": "11111111111111111111111111111112",
+      "entitlement": "25000000",
+      "leaf": "77fda321ca6d8422ae0ebb0ed20da2c29280095a6425e4a809820a865dfa1287",
+      "proof": [
+        "d37909bd36c1b1774af435a6b11d083cc8477a7954f87f44aaf7a1a21c8fef52",
+        "06ce9bb6d997e4214773ada59efbc39a03489da93d40dc5538440d3ec21625f3",
+        "cb31e2bcee9d00f2bce40c24dc93836af82bb8622be1958d1194806b3b323129"
+      ]
+    },
+    {
+      "wallet": "S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS",
+      "entitlement": "40326901",
+      "leaf": "d37909bd36c1b1774af435a6b11d083cc8477a7954f87f44aaf7a1a21c8fef52",
+      "proof": [
+        "77fda321ca6d8422ae0ebb0ed20da2c29280095a6425e4a809820a865dfa1287",
+        "06ce9bb6d997e4214773ada59efbc39a03489da93d40dc5538440d3ec21625f3",
+        "cb31e2bcee9d00f2bce40c24dc93836af82bb8622be1958d1194806b3b323129"
+      ]
+    },
+    {
+      "wallet": "So11111111111111111111111111111111111111112",
+      "entitlement": "100000000",
+      "leaf": "849f17cbbd598c90ebbae072384d4d0a6363958e2d7a62faab7127dd655480d8",
+      "proof": [
+        "4e1588844020aa0fe7dea6754c2b5b95c187e33e9f8e45640a026ec49f3db316",
+        "27183cd0c3a19297013a98cffdf8b0eadbfa5b081baf62347e06a530736d4c49",
+        "cb31e2bcee9d00f2bce40c24dc93836af82bb8622be1958d1194806b3b323129"
+      ]
+    },
+    {
+      "wallet": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+      "entitlement": "1",
+      "leaf": "4e1588844020aa0fe7dea6754c2b5b95c187e33e9f8e45640a026ec49f3db316",
+      "proof": [
+        "849f17cbbd598c90ebbae072384d4d0a6363958e2d7a62faab7127dd655480d8",
+        "27183cd0c3a19297013a98cffdf8b0eadbfa5b081baf62347e06a530736d4c49",
+        "cb31e2bcee9d00f2bce40c24dc93836af82bb8622be1958d1194806b3b323129"
+      ]
+    },
+    {
+      "wallet": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "entitlement": "18446744073709551615",
+      "leaf": "cb31e2bcee9d00f2bce40c24dc93836af82bb8622be1958d1194806b3b323129",
+      "proof": [
+        "c0a7b235fcd8170316a78de75f5e62e01b437a54b1d75e1b958ebb8a200296b1"
+      ]
+    }
+  ]
+}

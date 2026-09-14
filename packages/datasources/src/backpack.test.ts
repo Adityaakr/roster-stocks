@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BackpackClient, BackpackSecuritiesRail } from "./backpack.js";
+import { BackpackClient, BackpackSecuritiesRail } from "./backpack";
 
 // Fixture captured from GET https://api.backpack.exchange/api/v1/securities on 2026-09-14 (first entry).
 const securitiesFixture = [

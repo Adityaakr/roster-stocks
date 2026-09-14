@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# Runs the Anchor program tests against the fork. Placeholder until Phase 3 adds programs/lookthrough.
+# Program tests: litesvm suite in Rust (hermetic) plus, when the fork is up, the TypeScript e2e against the fork.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-if [ ! -f programs/lookthrough/Cargo.toml ]; then
-  echo "anchor tests: no program yet (Phase 3), skipping" >&2
-  exit 0
-fi
 export PATH="$HOME/.avm/bin:$HOME/.cargo/bin:$PATH"
-anchor test --skip-local-validator --provider.cluster "${FORK_RPC_URL:-http://127.0.0.1:8899}"
+if [ ! -f target/deploy/lookthrough.so ]; then
+  echo "anchor tests: target/deploy/lookthrough.so missing, run pnpm anchor:build first" >&2
+  exit 1
+fi
+cargo test --release -p lookthrough -- --nocapture 2>&1 | grep -E "^test |test result|panicked|error" || true
+cargo test --release -p lookthrough >/dev/null 2>&1

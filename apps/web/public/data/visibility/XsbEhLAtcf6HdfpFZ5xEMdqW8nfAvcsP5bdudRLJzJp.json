@@ -1,0 +1,60 @@
+{
+  "mint": "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+  "symbol": "AAPLx",
+  "slot": 447038097,
+  "timestamp": 1789408337,
+  "decimals": 8,
+  "multiplier": "1.0032690125398187",
+  "supplyRaw": "15376355897175",
+  "accountsRaw": "15376355897175",
+  "accountsScanned": 62070,
+  "walletVisibleRaw": "15088027629490",
+  "programHeldRaw": "288328267685",
+  "programHeldPct": "1.87",
+  "breakdownByProgram": [
+    {
+      "label": "Kamino Lend",
+      "program": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+      "raw": "138324571773",
+      "pct": "0.89",
+      "accounts": 1
+    },
+    {
+      "label": "Raydium CLMM",
+      "program": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+      "raw": "79080626503",
+      "pct": "0.51",
+      "accounts": 180
+    },
+    {
+      "label": "other programs",
+      "program": "AjMx5My4YUDHMiCtLpTAtgkiUJgrpJnQqd5AcQnddHQW",
+      "raw": "41575022649",
+      "pct": "0.27",
+      "accounts": 7297
+    },
+    {
+      "label": "other programs (PDA holding lamports only)",
+      "program": "11111111111111111111111111111111",
+      "raw": "17625634867",
+      "pct": "0.11",
+      "accounts": 671
+    },
+    {
+      "label": "other programs (owner has no account)",
+      "program": null,
+      "raw": "11256110792",
+      "pct": "0.07",
+      "accounts": 3704
+    },
+    {
+      "label": "Token-2022",
+      "program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "raw": "466301101",
+      "pct": "0.00",
+      "accounts": 8
+    }
+  ],
+  "source": "fixture fixtures/accounts/AAPLx.json.gz",
+  "generatedAt": "2026-09-14T19:06:58.387Z"
+}

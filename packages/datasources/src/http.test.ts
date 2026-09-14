@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { HttpClient } from "./http.js";
+import { HttpClient } from "./http";
 
 describe("HttpClient", () => {
   it("retries 429 then succeeds, and caches GET", async () => {

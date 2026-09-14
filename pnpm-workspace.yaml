@@ -7,5 +7,11 @@ allowBuilds:
   bufferutil: true
   utf-8-validate: true
   sharp: true
+  "@stellar/stellar-sdk": false
+  blake-hash: false
+  protobufjs: false
+  tiny-secp256k1: false
+  unrs-resolver: false
+  usb: false
 minimumReleaseAgeExclude:
   - zod@4.6.5
