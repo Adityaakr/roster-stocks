@@ -79,27 +79,23 @@ const ROWS: [string, string, string, string, string][] = [
 ];
 const HEADS = ["Third-party wrappers", "Issuer-sponsored shares", "DTC tokenized entitlements", "Lookthrough"];
 
-/** The four-column table; the fourth column is the only element that uses both the surface and the accent. Stacks at phone width with Lookthrough first. */
+/** The four-column comparison; the Lookthrough column is white on the surface with an ink rule. Stacks at phone width with Lookthrough first. */
 export function FourColumns() {
   return (
     <div>
       <div className="fc-table scroll-x">
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14, lineHeight: "21px" }}>
+        <table className="fctable">
           <thead>
             <tr>
-              <th style={{ textAlign: "left", fontWeight: 400, color: "var(--slate)", padding: "0 12px 10px 0", borderBottom: "1px solid var(--line)", fontSize: 12 }} />
-              {HEADS.map((h, i) => (
-                <th key={h} style={{ textAlign: "left", fontWeight: 500, color: i === 3 ? "var(--accent)" : "var(--ink)", padding: "10px 12px", borderBottom: "1px solid var(--line)", borderTop: i === 3 ? "2px solid var(--accent)" : "1px solid transparent", background: i === 3 ? "var(--surface)" : "transparent", fontSize: 14 }}>{h}</th>
-              ))}
+              <th />
+              {HEADS.map((h, i) => <th key={h} className={i === 3 ? "us" : ""}>{h}</th>)}
             </tr>
           </thead>
           <tbody>
             {ROWS.map((r) => (
               <tr key={r[0]}>
-                <td style={{ padding: "10px 12px 10px 0", borderBottom: "1px solid var(--line)", color: "var(--slate)", fontSize: 13, whiteSpace: "nowrap", verticalAlign: "top" }}>{r[0]}</td>
-                {r.slice(1).map((c, i) => (
-                  <td key={i} style={{ padding: "10px 12px", borderBottom: "1px solid var(--line)", color: i === 3 ? "var(--ink)" : "var(--ink-2)", background: i === 3 ? "var(--surface)" : "transparent", verticalAlign: "top" }}>{c}</td>
-                ))}
+                <th scope="row">{r[0]}</th>
+                {r.slice(1).map((c, i) => <td key={i} className={i === 3 ? "us" : ""}>{c}</td>)}
               </tr>
             ))}
           </tbody>
@@ -107,20 +103,14 @@ export function FourColumns() {
       </div>
       <div className="fc-stack">
         {[3, 0, 1, 2].map((ci) => (
-          <div key={ci} style={{ border: "1px solid var(--line)", borderTop: ci === 3 ? "2px solid var(--accent)" : "1px solid var(--line)", background: ci === 3 ? "var(--surface)" : "transparent", padding: 16, marginBottom: 12 }}>
-            <div className="h-item" style={{ color: ci === 3 ? "var(--accent)" : "var(--ink)" }}>{HEADS[ci]}</div>
-            <dl className="kv" style={{ marginTop: 10, gridTemplateColumns: "1fr", gap: "4px 0" }}>
-              {ROWS.map((r) => (
-                <div key={r[0]} style={{ padding: "6px 0", borderTop: "1px solid var(--line)" }}>
-                  <dt style={{ fontSize: 12 }}>{r[0]}</dt>
-                  <dd style={{ textAlign: "left", whiteSpace: "normal", color: "var(--ink-2)", fontSize: 14 }}>{r[ci + 1]}</dd>
-                </div>
-              ))}
-            </dl>
+          <div key={ci} className={`fcblock ${ci === 3 ? "us" : ""}`}>
+            <div className="h-item">{HEADS[ci]}</div>
+            {ROWS.map((r) => (
+              <div key={r[0]} className="fcline"><span className="k">{r[0]}</span><span>{r[ci + 1]}</span></div>
+            ))}
           </div>
         ))}
       </div>
-      <style>{`.fc-stack{display:none}@media (max-width:809px){.fc-table{display:none}.fc-stack{display:block}}`}</style>
     </div>
   );
 }

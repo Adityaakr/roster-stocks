@@ -7,7 +7,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { CountUp, MountReveal, PixelReveal, Reveal, Roll, ScrollColorText, SlideIn, Ticker, WordReveal } from "@/components/motion";
 import { slotLabel, usdc, short } from "@/lib/format";
 import type { LandingData } from "@/lib/landing-data";
-import { Quadrant } from "./false-choice";
+import { FourColumns, Quadrant } from "./false-choice";
 import { Statements } from "./statements";
 import { SOURCES } from "./evidence";
 
@@ -141,40 +141,65 @@ export function WorkflowTabs({ data }: { data: LandingData }) {
   );
 }
 
-/* 4. Automation: accordion + image, auto-cycling every 6 s */
-const CHOICES: { t: string; d: string }[] = [
-  { t: "Third-party wrappers", d: "xStocks, Ondo, Robinhood. Tracker certificates or custodial claims, freely usable in DeFi, with no shareholder rights or a preference the issuer may consider. Inside a pool, the record date sees the pool." },
-  { t: "Issuer-sponsored shares", d: "Superstate, Securitize, Figure. The share itself, on a transfer agent's register. Full rights from a recognised wallet, and invisible to the register the moment it enters a program." },
-  { t: "DTC tokenized entitlements", d: "The DTC service, second half of 2026. Depository entitlements on approved chains, transfers restricted to registered wallets. Rights intact, DeFi excluded by design." },
-  { t: "The 1973 look-through", d: "Immobilised shares tracked through intermediaries so a holder in street name still gets the dividend and the proxy. Tokenized stocks reproduced the immobilisation and skipped the look-through." },
-  { t: "Lookthrough", d: "A look-through register for any rights-bearing share, wherever it sits. The record date sees the person behind the program, attributed once under the issuer's rule, with a Merkle root anyone can recompute." }
-];
-
-export function ChoiceAccordion() {
-  const [open, setOpen] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const reduce = useReducedMotion();
-  useEffect(() => {
-    if (paused || reduce) return;
-    const t = setInterval(() => setOpen((o) => (o + 1) % CHOICES.length), 6000);
-    return () => clearInterval(t);
-  }, [paused, reduce]);
+/* 4. The false choice: the comparison table, then the 2x2 in the framed slot */
+export function ChoiceTable() {
   return (
     <Sec id="choice" className="automation" ticks={false}>
       <div style={{ padding: "80px 0", display: "flex", flexDirection: "column", gap: 50 }}>
         <div style={{ padding: "0 30px", display: "flex", flexDirection: "column", gap: 20 }}>
           <ScrollColorText as="h2" text="Rights, or composability. Nobody should have to pick." className="h-section" style={{ maxWidth: 896 }} />
-          <Reveal y={0} delay={0.2}><p className="body" style={{ margin: 0, maxWidth: 796 }}>Three ways exist to put a stock on a blockchain today, and all three make the holder choose. Lookthrough is the fourth: rights-bearing shares, freely composable, with a register that can see through the program to the person.</p></Reveal>
+          <Reveal y={0} delay={0.2}><p className="body" style={{ margin: 0, maxWidth: 796 }}>Three ways exist to put a stock on a blockchain today, and all three make the holder choose. Lookthrough is the fourth column: rights-bearing shares, freely composable, with a register that can see through the program to the person.</p></Reveal>
+        </div>
+        <Reveal y={48}><div style={{ padding: "0 30px" }}><FourColumns /></div></Reveal>
+        <div className="two" style={{ display: "grid", gridTemplateColumns: "392px minmax(0, 1fr)", gap: 64, alignItems: "center", padding: "0 45px 0 30px" }}>
+          <div>
+            <div className="h-item" style={{ fontSize: 22, letterSpacing: "-0.03em" }}>The empty corner</div>
+            <p className="body" style={{ margin: "12px 0 0" }}>Composability across, rights up. Every incumbent sits in a corner that gives one up. The shaded quadrant is where a rights-bearing share can sit in a pool and still be paid and polled. That is the fourth column, drawn.</p>
+          </div>
+          <Reveal y={48} delay={0.1}><div className="aimage"><div style={{ padding: 8 }}><Quadrant /></div></div></Reveal>
+        </div>
+      </div>
+      <style>{`@media (max-width: 809px) { .automation .two { grid-template-columns: minmax(0, 1fr) !important; gap: 24px !important; padding: 0 18px !important; } }`}</style>
+    </Sec>
+  );
+}
+
+/* 4b. Evidence: the accordion-and-image design, cycling every 6 s through the sources */
+const EVIDENCE: { t: string; d: string; date: string; fix: string | null; links: { href: string; label: string }[] }[] = [
+  { t: "Malinova and Park", date: "Research Policy, 2026", fix: "an opt-in registry with a look-through", d: "Attributing beneficial ownership when tokens sit inside smart contracts is the unresolved problem of tokenizing equities; whitelists break DeFi; the workable answer is an opt-in registry with a look-through into pool positions.", links: [{ href: SOURCES.malinova, label: "Research Policy 55, 105497" }] },
+  { t: "Securities Transfer Association", date: "Letter to the SEC, July 1, 2026", fix: "the issuer-sponsored model", d: "On behalf of 100+ transfer agents keeping the books for 15,000 issuers and 100 million registered shareholders: the register must remain authoritative, and third-party tokens threaten the loss of reliable holder information.", links: [{ href: SOURCES.sta, label: "Comment letter" }] },
+  { t: "SEC staff and the Commission", date: "January 28 and September 1, 2026", fix: "a taxonomy tied to the register, and new transfer agent rules", d: "A taxonomy that ties shareholder rights to the official register, followed by the first overhaul of transfer agent rules since the 1970s, asking how ownership records should interact with distributed ledgers.", links: [{ href: SOURCES.secStaff, label: "Staff statement" }, { href: SOURCES.secTa, label: "Proposed rules" }] },
+  { t: "DTCC", date: "December 2025 and June 2026", fix: "tokenized entitlements for registered wallets", d: "A no-action letter to tokenize Russell 1000 shares with full entitlements from the second half of 2026, transfers restricted to registered wallets; and a public case that tokenized corporate actions need continuous entitlement tracking and programmable elections.", links: [{ href: SOURCES.dtccNoAction, label: "No-action relief" }, { href: SOURCES.dtccIsitc, label: "ISITC webinar" }] },
+  { t: "a16z crypto and Sentora", date: "May and August 2026", fix: null, d: "Tokenized assets have proved the concept; the hard part is deeper integration into composable infrastructure. Corporate-action handling follows the issuance model, and the gap on voting is consistent across live wrapper programmes.", links: [{ href: SOURCES.a16zRwa, label: "a16z crypto" }, { href: SOURCES.sentora, label: "Sentora Research" }] },
+  { t: "Ondo and Broadridge", date: "April 2026", fix: "wallet-native voting", d: "Wallet-native voting for tokenized stocks. It counts wallets, and it relays preferences rather than proxies. The share of supply inside programs is the part it cannot reach.", links: [{ href: SOURCES.metamask, label: "MetaMask on Ondo voting" }] }
+];
+
+export function EvidenceAccordion() {
+  const [open, setOpen] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const reduce = useReducedMotion();
+  useEffect(() => {
+    if (paused || reduce) return;
+    const t = setInterval(() => setOpen((o) => (o + 1) % EVIDENCE.length), 6000);
+    return () => clearInterval(t);
+  }, [paused, reduce]);
+  const e = EVIDENCE[open]!;
+  return (
+    <Sec id="evidence" className="automation" ticks={false}>
+      <div style={{ padding: "80px 0", display: "flex", flexDirection: "column", gap: 50 }}>
+        <div style={{ padding: "0 30px", display: "flex", flexDirection: "column", gap: 20 }}>
+          <ScrollColorText as="h2" text="The problem is already in the record. The fix wasn't." className="h-section" style={{ maxWidth: 896 }} />
+          <Reveal y={0} delay={0.2}><p className="body" style={{ margin: 0, maxWidth: 796 }}>Everyone below names the problem. Most propose a fix that stops at the wallet. Lookthrough is the first thing built on the prescription.</p></Reveal>
         </div>
         <Reveal y={48}>
           <div className="atab" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
             <div className="acards">
-              {CHOICES.map((c, j) => (
+              {EVIDENCE.map((c, j) => (
                 <div key={c.t} className={`acard ${open === j ? "active" : ""}`}>
                   <button aria-expanded={open === j} onClick={() => { setOpen(j); setPaused(true); }}>{c.t}</button>
                   <AnimatePresence initial={false}>
                     {open === j ? (
-                      <motion.p key="body" initial={reduce ? false : { height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.6, ease: [0.2, 0, 0, 1] }}>{c.d}</motion.p>
+                      <motion.p key="body" initial={reduce ? false : { height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.6, ease: [0.2, 0, 0, 1] }}>{c.date}</motion.p>
                     ) : null}
                   </AnimatePresence>
                 </div>
@@ -182,12 +207,17 @@ export function ChoiceAccordion() {
             </div>
             <div className="aimage">
               <AnimatePresence initial={false} mode="wait">
-                <motion.div key={open} initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ ...SPRING, duration: 0.6 }}>
-                  {open === CHOICES.length - 1 ? (
-                    <div style={{ padding: 8 }}><Quadrant /></div>
-                  ) : (
-                    <Image src={IMG.automation[open] ?? IMG.automation[0]!} alt="" width={738} height={433} unoptimized style={{ width: "100%", height: "auto", display: "block" }} />
-                  )}
+                <motion.div key={open} initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ ...SPRING, duration: 0.6 }} className="evcard">
+                  <div className="mono note">{e.date}</div>
+                  <p className="evq">{e.d}</p>
+                  <div className="evrow">
+                    <span><i className="yes">✓</i>names the problem</span>
+                    <span><i className={e.fix ? "yes" : "no"}>{e.fix ? "✓" : "–"}</i>{e.fix ? `proposes ${e.fix}` : "no fix proposed"}</span>
+                    <span><i className="no">–</i>ships the look-through</span>
+                  </div>
+                  <div className="btnrow" style={{ marginTop: 18 }}>
+                    {e.links.map((l) => <a key={l.href} className="navlink" href={l.href} target="_blank" rel="noreferrer">{l.label}</a>)}
+                  </div>
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -277,13 +307,14 @@ export function Connect({ data }: { data: LandingData }) {
   return (
     <Sec id="problem" className="connect">
       <div style={{ padding: "80px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: 85, position: "relative" }}>
-        <Image src={IMG.connectBg} alt="" width={1224} height={891} unoptimized aria-hidden style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.9, pointerEvents: "none" }} />
+        <Image src={IMG.connectBg} alt="" width={1224} height={891} unoptimized aria-hidden style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.35, pointerEvents: "none" }} />
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", position: "relative" }}>
           <Reveal y={18} style={{ width: "100%" }}><p className="body" style={{ margin: 0, color: "var(--ink-2)", textAlign: "center" }}>The problem, told the way it happens</p></Reveal>
           <ScrollColorText as="h2" text="Two statements, one dividend." className="h-section" style={{ maxWidth: 697, textAlign: "center" }} />
+          <Reveal y={18} delay={0.2}><p className="body" style={{ margin: "10px auto 0", maxWidth: 640, textAlign: "center" }}>The same shares, seen from your account and from the pool&apos;s. Then the third statement, the one Lookthrough writes.</p></Reveal>
         </div>
         <Reveal y={48} style={{ width: "100%", maxWidth: 1110, position: "relative" }}>
-          <div style={{ background: "#fff", border: "1px solid var(--line)", padding: 24 }}><Statements data={data} /></div>
+          <Statements data={data} />
         </Reveal>
       </div>
     </Sec>

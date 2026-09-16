@@ -24,7 +24,7 @@ export function Reveal({ children, y = 24, delay = 0, className, style, as = "di
   const reduce = useReducedMotion();
   const Tag = motion[as] as typeof motion.div;
   return (
-    <Tag className={className} style={style} initial={reduce ? false : { opacity: 0, y }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once, amount }} transition={{ ...SPRING_SOFT, delay }}>
+    <Tag className={className} style={style} initial={reduce ? false : { opacity: 0, y }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once, amount, margin: "60% 0px 0px 0px" }} transition={{ ...SPRING_SOFT, delay }}>
       {children}
     </Tag>
   );
@@ -173,7 +173,7 @@ export function Stagger({ children, step = 0.08, base = 0, className, once = tru
   return (
     <div className={className}>
       {children.map((c, i) => (
-        <motion.div key={i} initial={reduce ? false : { opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once, amount: 0.4 }} transition={{ duration: 0.22, ease: [0.2, 0, 0, 1], delay: base + i * step }}>
+        <motion.div key={i} initial={reduce ? false : { opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once, amount: 0.2, margin: "100% 0px 0px 0px" }} transition={{ duration: 0.22, ease: [0.2, 0, 0, 1], delay: base + i * step }}>
           {c}
         </motion.div>
       ))}

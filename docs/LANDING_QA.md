@@ -1,9 +1,9 @@
 # Landing QA
 
-Generated 2026-09-16T09:40:23.330Z against http://localhost:3000. One screenshot per section at 1280px and 390px, with the feeling each section is meant to leave.
+Generated 2026-09-16T10:41:26.350Z against http://localhost:3000. One screenshot per section at 1280px and 390px, with the feeling each section is meant to leave.
 
 - desktop: document scroll width 1280px at viewport 1280px
-- phone: document scroll width 390px at viewport 390px
+- phone: document scroll width 632px at viewport 390px (HORIZONTAL OVERFLOW)
 
 ## hero
 
@@ -39,7 +39,7 @@ Four steps as tab cards; the image on the right follows the active card.
 
 ## choice
 
-The accordion cycles through the four options; the last one is the 2x2 with the empty corner filled.
+The four-column table, then the 2x2 with the empty corner shaded.
 
 ![choice at 1280](landing-qa/choice-desktop.png)
 
@@ -61,9 +61,17 @@ Four measured figures counting up, with their slots.
 
 ![number at 390](landing-qa/number-phone.png)
 
+## evidence
+
+The sources cycle through the accordion; every one names the problem, none ships the look-through.
+
+![evidence at 1280](landing-qa/evidence-desktop.png)
+
+![evidence at 390](landing-qa/evidence-phone.png)
+
 ## problem
 
-The statements make the failure concrete and the fix legible.
+Three bank statements: yours, the pool's, and the one Lookthrough writes.
 
 ![problem at 1280](landing-qa/problem-desktop.png)
 

@@ -12,10 +12,11 @@ const SECTIONS = [
   ["brands", "#brands", "Serious institutions already named the problem this year."],
   ["check", "#check", "The reader tests a wallet before reading anything else."],
   ["works", "#works", "Four steps as tab cards; the image on the right follows the active card."],
-  ["choice", "#choice", "The accordion cycles through the four options; the last one is the 2x2 with the empty corner filled."],
+  ["choice", "#choice", "The four-column table, then the 2x2 with the empty corner shaded."],
   ["feature", "#feature", "Two live actions, three next, all on the same root."],
   ["number", "#number", "Four measured figures counting up, with their slots."],
-  ["problem", "#problem", "The statements make the failure concrete and the fix legible."],
+  ["evidence", "#evidence", "The sources cycle through the accordion; every one names the problem, none ships the look-through."],
+  ["problem", "#problem", "Three bank statements: yours, the pool's, and the one Lookthrough writes."],
   ["pricing", "#pricing", "Three audiences laid out like the plan table, each with a real figure."],
   ["questions", "#questions", "Boxed accordion, one answer open at a time."],
   ["cta", "#cta", "The closing line and the two doors."]

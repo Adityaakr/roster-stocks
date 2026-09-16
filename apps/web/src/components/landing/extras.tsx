@@ -4,7 +4,6 @@ import { Reveal, ScrollColorText } from "@/components/motion";
 import type { LandingData } from "@/lib/landing-data";
 import { WalletCheck } from "./wallet-check";
 import { SupplyStrip } from "./supply-strip";
-import { EvidenceMatrix, Timeline } from "./evidence";
 
 /** The instrument, centred in a crosshair frame the way the reference frames its illustrations. */
 export function CheckSection({ example }: { example: string | null }) {
@@ -37,13 +36,6 @@ export function NumberStrip({ data }: { data: LandingData }) {
         <div>
           <ScrollColorText as="h2" text="One in three SPYx shares belongs to a program." className="h-section" />
           <Reveal y={18} delay={0.1}><p className="body" style={{ marginTop: 18, maxWidth: 520 }}>Read from every token account on mainnet at one slot. Programs are named from their on-chain IDL, never guessed. Every new venue moves the number up; nothing moves it down.</p></Reveal>
-          <Reveal y={18} delay={0.2}>
-            <details style={{ marginTop: 28 }}>
-              <summary className="link" style={{ cursor: "pointer", display: "inline", fontSize: 15, color: "var(--ink)" }}>Documented, not discovered: who named the problem this year</summary>
-              <div style={{ marginTop: 18 }}><EvidenceMatrix /></div>
-              <div style={{ marginTop: 28 }}><Timeline programHeldPct={data.spy.programHeldPct} /></div>
-            </details>
-          </Reveal>
         </div>
         <Reveal y={48} delay={0.1}><SupplyStrip spy={data.spy} aapl={data.aapl} /></Reveal>
       </div>
