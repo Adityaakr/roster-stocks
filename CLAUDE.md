@@ -41,8 +41,8 @@ tokens.xyz (base `https://api.tokens.xyz/v1`, header `x-api-key`, all server-sid
 - `GET /assets/search?q=apple&limit=…` result fields `assetId, name, symbol, category, primaryVariant{mint, kind, stockVariantTier, liquidityTier, market}, variants?`
 - `GET /assets/resolve?mint=<mint>` fields `assetId, resolvedBy, mint, asset{assetId,name,symbol,category,aliases}, variant{mint,chain,kind,liquidityTier,trustTier,tags,issuer,issuerUrl,label}`
 - `GET /assets/:assetId/variants?kind=tokenized_equity` per variant `mint, chain, kind, stockVariantTier (share_redeemable|cash_redeemable|not_redeemable), liquidityTier (tier1|tier2|tier3), market{price, liquidity, volume1hUSD, …, asOf}, decimals, symbol, name, advisory`
-- `GET /assets/:assetId/markets?mint=<mint>&limit=50` per market `poolAddress, dex|venue, liquidity, baseMint, quoteMint, source, …`
-- `GET /assets/:assetId/price-chart?mint=<mint>&interval=1H` candles `timestamp, open, high, low, close, volume`
+- `GET /assets/:assetId/markets?mint=<mint>&limit=50` returns `{ assetId, mint, markets: [{ address, name, price, liquidity, volume24h, trade24h, uniqueWallet24h, base{address,symbol,decimals}, quote{…} }], total, offset, limit }` (live shape 2026-09-16; the docs page's `poolAddress`/`dex` names are not what the API returns)
+- `GET /assets/:assetId/price-chart?mint=<mint>&interval=1H` returns `{ assetId, interval, from, to, candles: [{ time, open, high, low, close, volume }] }` (live shape; `time` not `timestamp`)
 - `POST /assets/market-snapshots` body `{ "mints": [...] }`
 
 Backpack (base `https://api.backpack.exchange`, public): `GET /api/v1/securities`, `GET /api/v1/market-sessions`, `GET /api/v1/market-holidays`, `GET /api/v1/ticker?symbol=…&source=External`, `GET /api/v1/klines?symbol=…&interval=…&startTime=…&source=External`. Signing (stretch only): headers `X-API-Key, X-Signature, X-Timestamp, X-Window`; payload `instruction=<name>&<alphabetical params>&timestamp=…&window=…`, ED25519, base64.
@@ -70,7 +70,7 @@ Anchor program `lookthrough`: PDAs `["reg", mint, wallet]`, `["action", action_i
 
 ### Phase order and acceptance
 
-0. Scaffold: monorepo, `pnpm verify` green with placeholder tests, `scripts/fork.sh`, clients return real data for `apple` and `AAPL.US`. Needs `TOKENS_API_KEY` from the user (still missing on 2026-09-14 evening; the base URL alone returns 401).
+0. Scaffold: monorepo, `pnpm verify` green with placeholder tests, `scripts/fork.sh`, clients return real data for `apple` and `AAPL.US`. `TOKENS_API_KEY` supplied on 2026-09-16 (in `.env`, ignored by git); the issuer console's search, wrapper table and markets line are live.
 1. Resolver core: direct adapter, classification, unattributed bucket, visibility stat for AAPLx and SPYx, invariant test on a captured fixture.
 2. Raydium CLMM and Kamino adapters, rules, tree, CLI `schedule` and `snapshot`. Alice resolves to 100 shares on the fork.
 3. Anchor program, SDK, CLI `publish`, `fund`, `proof`. Claim and vote from the CLI, double claim rejected.

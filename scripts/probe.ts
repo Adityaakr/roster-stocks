@@ -30,7 +30,9 @@ async function main() {
   const variants = await tokens.variants(resolved.assetId, { kind: "tokenized_equity" });
   console.log("tokens.xyz variants:", variants.map((v) => ({ mint: v.mint, symbol: v.symbol, tier: v.stockVariantTier, liq: v.liquidityTier })));
   const markets = await tokens.markets(resolved.assetId, DEFAULT_MINT, 10);
-  console.log("tokens.xyz markets:", markets.map((m) => ({ pool: m.poolAddress, dex: m.dex ?? m.venue, liquidity: m.liquidity })));
+  console.log("tokens.xyz markets:", markets.map((m) => ({ pool: m.address, name: m.name, liquidity: m.liquidity })));
+  const candles = await tokens.priceChart(resolved.assetId, { mint: DEFAULT_MINT, interval: "1H" });
+  console.log("tokens.xyz price-chart (mint series):", { candles: candles.length, last: candles.at(-1) });
 }
 
 main().catch((err) => {

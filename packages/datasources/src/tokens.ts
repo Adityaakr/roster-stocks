@@ -68,22 +68,28 @@ export const ResolveResponse = z
   .loose();
 export type ResolveResponse = z.infer<typeof ResolveResponse>;
 
+/** Live shape observed on 2026-09-16 (the docs page lists `poolAddress`/`dex`; the API returns `address`, `name`, `base`, `quote`). */
 export const Market = z
   .object({
-    poolAddress: z.string(),
-    dex: z.string().optional(),
-    venue: z.string().optional(),
+    address: z.string(),
+    name: z.string().optional(),
+    price: z.number().nullable().optional(),
     liquidity: z.number().nullable().optional(),
-    baseMint: z.string().optional(),
-    quoteMint: z.string().optional(),
-    source: z.string().optional()
+    volume24h: z.number().nullable().optional(),
+    trade24h: z.number().nullable().optional(),
+    uniqueWallet24h: z.number().nullable().optional(),
+    createdAt: z.string().optional(),
+    base: z.object({ address: z.string(), symbol: z.string().optional(), decimals: z.number().optional() }).loose().optional(),
+    quote: z.object({ address: z.string(), symbol: z.string().optional(), decimals: z.number().optional() }).loose().optional(),
+    dex: z.string().optional(),
+    venue: z.string().optional()
   })
   .loose();
 export type Market = z.infer<typeof Market>;
 
 export const Candle = z
   .object({
-    timestamp: z.number(),
+    time: z.number(),
     open: z.number(),
     high: z.number(),
     low: z.number(),

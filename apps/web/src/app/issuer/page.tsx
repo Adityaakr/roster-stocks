@@ -16,6 +16,13 @@ interface Variant {
   liquidityTier?: string;
   market?: { liquidity?: number | null; price?: number | null } | null;
 }
+interface MarketRow {
+  address: string;
+  name?: string;
+  liquidity?: number | null;
+  volume24h?: number | null;
+  quote?: { symbol?: string };
+}
 interface ActionRecord {
   id: string;
   kind: "distribution" | "vote";
@@ -43,6 +50,7 @@ export default function IssuerPage() {
   const [search, setSearch] = useState<{ results?: { assetId: string; symbol: string; name: string }[]; error?: string; configured?: boolean } | null>(null);
   const [assetId, setAssetId] = useState<string | null>(null);
   const [variants, setVariants] = useState<Variant[] | null>(null);
+  const [markets, setMarkets] = useState<MarketRow[] | null>(null);
   const [mint, setMint] = useState(DEFAULT_MINT);
   const [kind, setKind] = useState<"distribution" | "vote">("distribution");
   const [label, setLabel] = useState(`console-${new Date().toISOString().slice(0, 10)}`);
@@ -76,6 +84,15 @@ export default function IssuerPage() {
     const j = (await res.json()) as { variants?: Variant[] };
     setVariants(j.variants ?? []);
   }
+
+  /** Where the selected mint lives: the pools tokens.xyz lists for it, which is the resolver's starting list of containers. */
+  useEffect(() => {
+    if (!assetId) return;
+    fetch(`/api/tokens/markets?assetId=${encodeURIComponent(assetId)}&mint=${mint}&limit=8`)
+      .then((r) => r.json())
+      .then((j: { markets?: MarketRow[] }) => setMarkets(j.markets ?? []))
+      .catch(() => setMarkets(null));
+  }, [assetId, mint]);
 
   async function post<T>(url: string, body: unknown): Promise<T> {
     const res = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
@@ -215,6 +232,18 @@ export default function IssuerPage() {
                     ))}
                   </tbody>
                 </table>
+              ) : null}
+              {markets && markets.length ? (
+                <div className="text-[13px] text-ink-2">
+                  Where this mint trades (tokens.xyz markets, liquidity in USD):{" "}
+                  {markets.slice(0, 6).map((m, i) => (
+                    <span key={m.address}>
+                      {i ? ", " : ""}
+                      {m.name ?? m.address.slice(0, 6)} <span className="num text-ink">{m.liquidity != null ? Math.round(m.liquidity).toLocaleString("en-US") : "n/a"}</span>
+                    </span>
+                  ))}
+                  . Only Raydium CLMM pools among these are looked through; the rest stay labelled and unattributed.
+                </div>
               ) : null}
               <div className="flex flex-wrap items-center gap-3">
                 <input className="flex-1 min-w-[240px] max-w-[520px] h-10 px-3 rounded-[10px] border border-line bg-surface num text-[13px]" value={mint} onChange={(e) => setMint(e.target.value)} placeholder="Mint in scope" aria-label="Mint in scope" />

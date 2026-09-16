@@ -15,3 +15,7 @@ Dated log of non-obvious choices, with the alternative rejected.
 - **`@solana/kit` pinned to 2.3.0 where klend-sdk is used.** klend-sdk 12 declares `^2.3.0`; installing the latest 8.x alongside produces two incompatible `Rpc` types.
 - **Vote scene stays on AAPLx but is labelled simulated.** Alternative was switching the vote to a mint that carries votes; none is on the fork with liquidity. The label "simulated issuer; xStocks carry no voting rights" is mandatory copy.
 - **Alchemy mainnet URL used for point reads only.** It returns 429 on gPA and getTokenLargestAccounts; full scans go through the fork's datasource proxy (public mainnet), which served 61k accounts.
+
+## 2026-09-16
+
+- **tokens.xyz key supplied; schemas follow the live API, not the docs page.** `GET /assets/:id/markets` returns rows with `address`, `name`, `base{address,symbol,decimals}`, `quote{…}`, `liquidity`, `volume24h`, `trade24h` (the docs page says `poolAddress`/`dex`); `price-chart` candles use `time`, not `timestamp`. Schemas stay loose so extra fields pass through. Verified on 2026-09-16 for `apple` and AAPLx: variants AAPLx and AAPLon, both `cash_redeemable`, `tier3`; six markets for AAPLx, the two largest being the Raydium CLMM pools the resolver already looks through.
