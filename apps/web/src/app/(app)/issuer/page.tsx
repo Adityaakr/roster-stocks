@@ -6,6 +6,7 @@ import { useDemoWallet } from "@/lib/demo-wallet";
 import { explorerUrl, useCluster } from "@/lib/cluster";
 import { pct, shares, short, slotLabel, usdc } from "@/lib/format";
 import { Address, Badge, ErrorState, KV, Logo, fmtCompact } from "@/components/ui";
+import { M } from "@/components/mono";
 
 interface Variant {
   mint: string;
@@ -29,7 +30,7 @@ interface ActionRecord {
   amountPerShareMicro?: string;
   question?: string;
   snapshot?: { slotActual: number; timestamp: number; root: string; contentHash: string; totalEntitlement: string; leaves: number; attributedPct: string };
-  onchain?: { actionPda: string; createTx: string; fundTx?: string; vault?: string };
+  onchain?: { actionPda: string; createTx: string; fundTx?: string; vault?: string; publishedSlot?: number };
 }
 interface Job {
   id: string;
@@ -205,6 +206,10 @@ export default function IssuerPage() {
     return () => clearInterval(t);
   }, [step, action]);
 
+  // "waiting for record slot N, current M" lines in the log turn into the not-final-yet hint (about 0.4 s per slot).
+  const waitLine = job?.status === "running" ? [...job.lines].reverse().find((l) => l.startsWith("waiting for record slot")) : undefined;
+  const waitMatch = waitLine?.match(/record slot (\d+), current (\d+)/);
+  const waiting = waitMatch && waitLine === job?.lines[job.lines.length - 1] ? { target: Number(waitMatch[1]), seconds: Math.max(1, Math.ceil((Number(waitMatch[1]) - Number(waitMatch[2])) * 0.4)) } : null;
   const registered = entitlements?.entries.filter((e) => e.registered) ?? [];
   const totalRaw = entitlements ? BigInt(entitlements.attributedRaw) + BigInt(entitlements.unattributedRaw) : 0n;
   const doneStep = (n: Step) => (n === 1 ? step > 1 : n === 2 ? !!action : n === 3 ? !!action?.snapshot : n === 4 ? !!action?.onchain : false);
@@ -344,7 +349,7 @@ export default function IssuerPage() {
               <p className="body-sm" style={{ margin: "6px 0 0" }}>Every token account of the mint is read at one slot, classified and attributed once. {devnet ? "On devnet the RPC refuses program-wide scans, so the resolver falls back to the largest-accounts method and says so." : "On the fork this takes several minutes."}</p>
               {!action ? <p className="msg" style={{ marginTop: 12 }}>Schedule an action first.</p> : null}
               {action && !action.snapshot ? (
-                <div className="btnrow" style={{ marginTop: 16 }}><button className="btn primary" onClick={runSnapshot} disabled={busy}>{busy ? "Snapshot running" : "Run snapshot at the record slot"}</button></div>
+                <div className="btnrow" style={{ marginTop: 16 }}><button className="btn primary" onClick={runSnapshot} disabled={busy}>{busy ? "Snapshotting" : "Snapshot holders"}</button>{waiting ? <span className="small">Slot <M>{slotLabel(waiting.target)}</M> is not final yet. Try again in about <M>{waiting.seconds}</M> seconds.</span> : null}</div>
               ) : null}
               {job ? (
                 <div className="log" style={{ marginTop: 16 }}>
@@ -357,6 +362,7 @@ export default function IssuerPage() {
                 </div>
               ) : null}
               {job?.status === "failed" ? <div style={{ marginTop: 12 }}><ErrorState message={`Snapshot failed: ${job.error}`} /></div> : null}
+              {job?.status === "done" && action?.snapshot ? <p className="msg green" style={{ marginTop: 12 }}>Snapshot complete, <M>{action.snapshot.attributedPct}%</M> attributed.</p> : null}
               {action?.snapshot && entitlements ? (
                 <div style={{ marginTop: 20 }}>
                   <div className="grid-3">
@@ -413,7 +419,7 @@ export default function IssuerPage() {
                     ]} />
                   </div>
                   <div className="btnrow" style={{ marginTop: 16 }}>
-                    {!action.onchain ? <button className="btn primary" onClick={publishAction} disabled={busy}>{busy ? "Publishing" : action.kind === "vote" ? "Publish and open" : "Publish and fund"}</button> : <button className="btn primary" onClick={() => setStep(5)}>Continue</button>}
+                    {!action.onchain ? <button className="btn primary" onClick={publishAction} disabled={busy}>{busy ? "Publishing" : "Publish record"}</button> : <><span className="msg green">Published{action.onchain.publishedSlot ? <> at slot <M>{slotLabel(action.onchain.publishedSlot)}</M></> : null}</span><button className="btn primary" onClick={() => setStep(5)}>Continue</button></>}
                   </div>
                 </>
               ) : (

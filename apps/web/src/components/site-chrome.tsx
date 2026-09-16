@@ -9,11 +9,10 @@ export function SiteNav() {
       <div className="container inner">
         <Link href="/" className="wordmark"><i />Lookthrough</Link>
         <nav className="links" aria-label="Site">
-          <a href="#problem">Problem</a>
+          <a href="#check">Check a wallet</a>
           <a href="#how">How it works</a>
           <a href="#product">Product</a>
-          <a href="#assets">Assets</a>
-          <a href="#faq">FAQ</a>
+          <a href="#faq">Questions</a>
         </nav>
         <div className="btnrow">
           <Link href="/portfolio" className="btn primary sm">Open the app</Link>
@@ -30,7 +29,7 @@ export function SiteFooter() {
         <div className="cols">
           <div>
             <Link href="/" className="wordmark"><i />Lookthrough</Link>
-            <p style={{ maxWidth: 360, marginTop: 14 }}>Record-date infrastructure for tokenized stocks on Solana. Entitlements are issuer-defined and never a determination of legal ownership. Nothing here is an offer of any security.</p>
+            <p style={{ maxWidth: 360, marginTop: 14 }}>Street name for DeFi. Record-date infrastructure for tokenized stocks on Solana. Entitlements are issuer-defined and never a determination of legal ownership. Nothing here is an offer of any security.</p>
           </div>
           <div>
             <h6 className="h6">Product</h6>
@@ -48,7 +47,7 @@ export function SiteFooter() {
         <div className="divider" style={{ margin: "40px 0 20px" }} />
         <div className="flex flex-wrap justify-between gap-3">
           <span>Built for the Solana Stocklana hackathon, September 2026.</span>
-          <span>Demo on a mainnet fork and on devnet. Issuer role simulated.</span>
+          <span>Records on the mainnet fork and on devnet are published by a registrar authority Lookthrough operates.</span>
         </div>
       </div>
     </footer>

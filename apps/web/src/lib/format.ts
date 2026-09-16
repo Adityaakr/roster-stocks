@@ -39,3 +39,13 @@ export function slotLabel(slot: number | string | bigint): string {
 export function timeLabel(unix: number): string {
   return new Date(unix * 1000).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }) + " UTC";
 }
+
+/** Share units rounded half up to `digits` decimals, for headline figures where a 34.999999 estimate should read 35.00. Tables keep `shares()`, which truncates. */
+export function sharesRounded(shares6: bigint | string, digits = 2): string {
+  const v = BigInt(shares6);
+  const scale = 10n ** BigInt(6 - digits);
+  const rounded = (v + scale / 2n) / scale;
+  const whole = rounded / 10n ** BigInt(digits);
+  const frac = (rounded % 10n ** BigInt(digits)).toString().padStart(digits, "0");
+  return `${whole.toLocaleString("en-US")}${digits ? `.${frac}` : ""}`;
+}

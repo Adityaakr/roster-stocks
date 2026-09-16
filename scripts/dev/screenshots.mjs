@@ -1,7 +1,7 @@
 /**
  * Full-page screenshots of every app page, for design review.
  *   node scripts/dev/screenshots.mjs http://localhost:3000 /tmp/shots
- * Run from apps/web (so @playwright/test resolves): cd apps/web && node ../../scripts/dev/screenshots.mjs
+ * Module resolution follows the file location, so copy it next to apps/web/e2e first: cp scripts/dev/screenshots.mjs apps/web/e2e/_shots.mjs && (cd apps/web && node e2e/_shots.mjs)
  */
 import { chromium } from "@playwright/test";
 

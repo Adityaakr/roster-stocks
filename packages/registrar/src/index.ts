@@ -270,10 +270,11 @@ export async function publish(store: ActionStore, id: string, log: Log, opts?: {
     ...(action.kind === "distribution" ? { amountPerShareMicro: BigInt(action.amountPerShareMicro ?? "0"), claimsCloseSlot: BigInt(slot + slotsFromNow(opts?.claimsWindowMinutes ?? 24 * 60)) } : {}),
     ...(action.kind === "vote" ? { questionHash: keccak_256(new TextEncoder().encode(action.question ?? "")), deadlineSlot: BigInt(action.deadlineSlot ?? slot + slotsFromNow(30)) } : {})
   });
+  const publishedSlot = await client.provider.connection.getSlot();
   action.status = action.kind === "vote" ? "open" : "published";
-  action.onchain = { actionPda: pda.toBase58(), createTx: signature, vault: vault.toBase58() };
+  action.onchain = { actionPda: pda.toBase58(), createTx: signature, vault: vault.toBase58(), publishedSlot };
   store.save(action);
-  log(`published ${id}: action ${pda.toBase58()}, vault ${vault.toBase58()}, tx ${signature}`);
+  log(`published ${id}: action ${pda.toBase58()}, vault ${vault.toBase58()}, tx ${signature}, slot ${publishedSlot}`);
   return action;
 }
 

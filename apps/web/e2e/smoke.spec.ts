@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 /** Every page renders, shows its key copy, and logs no console errors. Screenshots land in e2e/screenshots. */
 const pages = [
-  { path: "/?demo=1", heading: "Corporate actions for tokenized stocks, wherever the shares sit.", level: 1, name: "landing", wait: "table.table" },
+  { path: "/?demo=1", heading: "Your shares went into DeFi. The register lost you.", level: 1, name: "landing", wait: "input[aria-label=\"Wallet public key\"]" },
   { path: "/portfolio?demo=1", heading: "Portfolio", level: 1, name: "portfolio", wait: "table.table, [role=alert]" },
   { path: "/assets", heading: "Assets", level: 1, name: "assets", wait: ".asset-card, [role=alert]" },
   { path: "/assets/apple", heading: /Apple/, level: 1, name: "asset", wait: ".chart svg, .msg.red, [role=alert]" },
@@ -26,11 +26,21 @@ for (const p of pages) {
   });
 }
 
-test("landing hero shows the live demo ledger or an honest fallback", async ({ page }) => {
+test("the wallet check resolves the demo wallet in place", async ({ page, request }) => {
+  const s = (await (await request.get("/api/demo/summary")).json()) as { live?: boolean; wallet?: string };
+  test.skip(!s.live || !s.wallet, "chain not reachable or not seeded");
   await page.goto("/");
-  await page.locator("table.table").first().waitFor({ timeout: 40_000 });
-  const badge = page.locator(".badge", { hasText: /live from chain|chain not reachable/ }).first();
-  await expect(badge).toBeVisible();
+  await page.getByLabel("Wallet public key").fill(s.wallet!);
+  await page.getByRole("button", { name: "Check a wallet" }).click();
+  await expect(page.getByText(/A wallet scan sees/)).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByText(/Read at slot/)).toBeVisible();
+});
+
+test("the number block prints the measured values from the visibility scan", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: /One in three SPYx shares/ })).toBeVisible();
+  const pct = await page.locator(".h1.num").first().textContent();
+  expect(pct).toMatch(/^\d+\.\d{2}%$/);
 });
 
 test("assets directory opens an asset with a chart and its wrappers", async ({ page, request }) => {

@@ -10,6 +10,7 @@ import { useDemoWallet } from "@/lib/demo-wallet";
 import { explorerUrl, useCluster } from "@/lib/cluster";
 import { pct, shares, short, slotLabel, timeLabel, usdc } from "@/lib/format";
 import { Address, Badge, Empty, ErrorState, KV, Loading, Stat } from "@/components/ui";
+import { M } from "@/components/mono";
 import { Icon } from "@/components/icons";
 import { verifyLocally } from "@/lib/merkle-browser";
 
@@ -70,6 +71,7 @@ export default function PortfolioPage() {
   const [notice, setNotice] = useState<{ text: string; tone: "green" | "red" } | null>(null);
   const [proofOpen, setProofOpen] = useState<string | null>(null);
   const [choice, setChoice] = useState<Record<string, "for" | "against" | "abstain">>({});
+  const [lastTx, setLastTx] = useState<Record<string, string>>({});
   const wallet = demo.activePubkey;
 
   const load = useCallback(async () => {
@@ -113,15 +115,17 @@ export default function PortfolioPage() {
     try {
       if (demo.isDemo) {
         const res = await fetch(`/api/demo/${demo.selected}/${kind}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ mint, actionId, choice: voteChoice }) });
-        const j = (await res.json()) as { error?: string; amountPaid?: string; signature?: string | null };
+        const j = (await res.json()) as { error?: string; amountPaid?: string; signature?: string | null; slot?: string };
         if (!res.ok) throw new Error(j.error ?? `HTTP ${res.status}`);
-        say(kind === "register" ? "Registered for corporate actions." : kind === "claim" ? `Claimed ${usdc(j.amountPaid ?? "0")} USDC.` : `Voted ${voteChoice}.`);
+        if (actionId && j.signature) setLastTx((t) => ({ ...t, [actionId]: j.signature as string }));
+        say(kind === "register" ? `Registered at slot ${slotLabel(j.slot ?? 0)}.` : kind === "claim" ? `Claimed ${usdc(j.amountPaid ?? "0")} USDC${j.signature ? `, tx ${short(j.signature, 6)}` : ""}.` : `Cast ${voteChoice}.`);
       } else {
         if (!anchorWallet) throw new Error("Connect a wallet first.");
         const client = new LookthroughClient(connection, anchorWallet as unknown as ConstructorParameters<typeof LookthroughClient>[1]);
         if (kind === "register") {
-          const sig = await client.register(new PublicKey(mint));
-          say(`Registered for corporate actions. Transaction ${short(sig, 6)}.`);
+          await client.register(new PublicKey(mint));
+          const after = await client.isRegistered(new PublicKey(mint));
+          say(`Registered at slot ${slotLabel(after.slot ?? 0)}.`);
         } else {
           const pr = await fetch(`/api/actions/${actionId}/proof?wallet=${wallet}`).then((r) => r.json() as Promise<{ inTree: boolean; leaf?: { entitlement: string; proof: string[] } }>);
           if (!pr.inTree || !pr.leaf) throw new Error("This wallet is not in the tree for that action.");
@@ -131,10 +135,11 @@ export default function PortfolioPage() {
           const proof = pr.leaf.proof.map((h) => new Uint8Array(Buffer.from(h, "hex")));
           if (kind === "claim") {
             const sig = await client.claim(id, BigInt(pr.leaf.entitlement), proof);
-            say(`Claimed ${usdc((BigInt(pr.leaf.entitlement) * BigInt(a?.amountPerShareMicro ?? "0")) / 1_000_000n)} USDC. Transaction ${short(sig, 6)}.`);
+            if (actionId) setLastTx((t) => ({ ...t, [actionId]: sig }));
+            say(`Claimed ${usdc((BigInt(pr.leaf.entitlement) * BigInt(a?.amountPerShareMicro ?? "0")) / 1_000_000n)} USDC, tx ${short(sig, 6)}.`);
           } else {
-            const sig = await client.castVote(id, BigInt(pr.leaf.entitlement), proof, voteChoice ?? "for");
-            say(`Voted ${voteChoice}. Transaction ${short(sig, 6)}.`);
+            await client.castVote(id, BigInt(pr.leaf.entitlement), proof, voteChoice ?? "for");
+            say(`Cast ${voteChoice}.`);
           }
         }
       }
@@ -244,7 +249,7 @@ export default function PortfolioPage() {
                   {rows.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="muted">
-                        This wallet holds no {symbol} directly, in Raydium CLMM positions, or in Kamino deposits.{cluster.faucet ? " Use Get demo shares to mint some on devnet." : ""}
+                        No tokenized stock in this wallet. Connect one that holds a position, or <Link href="/assets" style={{ borderBottom: "1px solid var(--line-strong)" }}>browse the directory</Link>.{cluster.faucet ? " On devnet, Get demo shares mints some." : ""}
                       </td>
                     </tr>
                   ) : null}
@@ -318,17 +323,17 @@ export default function PortfolioPage() {
                         <div style={{ textAlign: "right", display: "grid", gap: 8, justifyItems: "end" }}>
                           <div className="h4 num">{a.kind === "distribution" ? `${usdc(claimed ? (a.receipt?.amountPaid ?? "0") : pay)} USDC` : `${shares(voted ? (a.receipt?.entitlement ?? "0") : ent, 2, 2)} votes`}</div>
                           {claimed ? (
-                            <span className="msg green">claimed, slot {slotLabel(a.receipt?.slot ?? 0)}</span>
+                            <span className="msg green">Claimed, slot <M>{slotLabel(a.receipt?.slot ?? 0)}</M>{lastTx[a.id] ? <>, tx <M>{short(lastTx[a.id] ?? "", 4)}</M></> : null}</span>
                           ) : voted ? (
-                            <span className="msg green">voted {a.receipt?.choice}, slot {slotLabel(a.receipt?.slot ?? 0)}</span>
+                            <span className="msg green">Cast {a.receipt?.choice}, slot <M>{slotLabel(a.receipt?.slot ?? 0)}</M></span>
                           ) : a.kind === "distribution" ? (
-                            <button className="btn primary sm" disabled={!a.inTree || !open || busy !== null} onClick={() => act("claim", a.id)}>{busy === `claim:${a.id}` ? "Claiming" : "Claim"}</button>
+                            <button className="btn primary sm" disabled={!a.inTree || !open || busy !== null} onClick={() => act("claim", a.id)}>{busy === `claim:${a.id}` ? "Claiming" : <>Claim <M>{usdc(pay)}</M> USDC</>}</button>
                           ) : (
                             <div className="btnrow">
                               <select className="field" style={{ height: 32, width: "auto", fontSize: 13 }} value={c} onChange={(e) => setChoice((s) => ({ ...s, [a.id]: e.target.value as "for" | "against" | "abstain" }))} aria-label="Vote choice">
                                 <option value="for">For</option><option value="against">Against</option><option value="abstain">Abstain</option>
                               </select>
-                              <button className="btn primary sm" disabled={!a.inTree || !open || busy !== null} onClick={() => act("vote", a.id, c)}>{busy === `vote:${a.id}` ? "Voting" : "Vote"}</button>
+                              <button className="btn primary sm" disabled={!a.inTree || !open || busy !== null} onClick={() => act("vote", a.id, c)}>{busy === `vote:${a.id}` ? "Casting" : <>Cast <M>{shares(ent, 0, 0)}</M> votes</>}</button>
                             </div>
                           )}
                           <button className="copy" onClick={() => setProofOpen(proofOpen === a.id ? null : a.id)} disabled={!a.inTree}>{proofOpen === a.id ? "hide proof" : "show proof"}</button>

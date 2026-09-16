@@ -5,7 +5,8 @@ import Link from "next/link";
 import { pct, shares, slotLabel, timeLabel, usdc } from "@/lib/format";
 import { Address, Badge, ErrorState, KV, Loading, Stat } from "@/components/ui";
 import { explorerUrl, useCluster } from "@/lib/cluster";
-import { verifyLocally } from "@/lib/merkle-browser";
+import { recomputeRoot, verifyLocally } from "@/lib/merkle-browser";
+import { M } from "@/components/mono";
 
 interface ActionResponse {
   action: {
@@ -44,6 +45,7 @@ export default function ActionPage({ params }: { params: Promise<{ id: string }>
   const [error, setError] = useState<string | null>(null);
   const [wallet, setWallet] = useState("");
   const [lookup, setLookup] = useState<{ ok: boolean; entitlement: string; leaf: string; proof: string[]; message?: string } | null>(null);
+  const [recomputed, setRecomputed] = useState<{ ok: boolean; root: string; leaves: number } | null>(null);
 
   useEffect(() => {
     fetch(`/api/actions/${id}`)
@@ -113,8 +115,13 @@ export default function ActionPage({ params }: { params: Promise<{ id: string }>
               <div><span className="k">content hash</span>{a.snapshot.contentHash}</div>
               <div><span className="k">action id</span>{a.actionIdHex}</div>
             </div>
+            <div className="btnrow" style={{ marginTop: 12 }}>
+              <button className="btn ghost sm" disabled={!data.tree} onClick={() => data.tree && a.snapshot && setRecomputed(recomputeRoot({ actionIdHex: a.actionIdHex, mint: a.mint, snapshotSlot: a.snapshot.slotActual, leaves: data.tree.leaves, root: oc?.root ?? a.snapshot.root }))}>Recompute root</button>
+              {recomputed ? recomputed.ok ? <span className="msg green">Root matches, <M>{recomputed.leaves.toLocaleString("en-US")}</M> leaves</span> : <span className="msg red">Root differs: recomputed {recomputed.root.slice(0, 12)}…</span> : <span className="small">Rebuilds the tree from the published leaves in this browser and compares it with the {oc ? "on-chain" : "published"} root.</span>}
+            </div>
             <div style={{ marginTop: 14 }}>
               <KV items={[
+                { k: "Published by", v: <span>a registrar authority Lookthrough operates{cluster.registrar ? <>, <Address value={cluster.registrar} href={explorerUrl(cluster, "address", cluster.registrar)} /></> : null}</span> },
                 { k: "Mint", v: <Address value={a.mint} href={explorerUrl(cluster, "address", a.mint)} /> },
                 ...(ent ? [{ k: "Multiplier", v: `${ent.multiplier} (${ent.multiplierSource})` }] : []),
                 ...(a.onchain ? [{ k: "Action account", v: <Address value={a.onchain.actionPda} href={explorerUrl(cluster, "address", a.onchain.actionPda)} /> }, { k: "Create transaction", v: <Address value={a.onchain.createTx} href={explorerUrl(cluster, "tx", a.onchain.createTx)} /> }] : [{ k: "On-chain", v: <Badge tone="yellow">not published yet</Badge> }]),
@@ -173,7 +180,8 @@ export default function ActionPage({ params }: { params: Promise<{ id: string }>
             <span style={{ width: `${pct(ent.unattributedRaw, totalRaw)}%`, background: "var(--yellow)" }} />
           </div>
           <div className="flex gap-5 small" style={{ marginTop: 8 }}><span><i className="inline-block w-2 h-2 rounded-full mr-1.5" style={{ background: "var(--green)" }} />attributed {pct(ent.attributedRaw, totalRaw)}%</span><span><i className="inline-block w-2 h-2 rounded-full mr-1.5" style={{ background: "var(--yellow)" }} />unattributed {pct(ent.unattributedRaw, totalRaw)}%</span></div>
-          {ent.invariants.warnings.length ? <p className="msg" style={{ marginTop: 12, color: "var(--yellow)" }}>{ent.invariants.warnings.join(" · ")}</p> : <p className="msg green" style={{ marginTop: 12 }}>Scanned token accounts sum exactly to mint supply.</p>}
+          {BigInt(ent.unattributedRaw) > 0n ? <p className="body-sm" style={{ marginTop: 12 }}><M>{pct(ent.unattributedRaw, totalRaw)}%</M> of supply is held by programs without an adapter. Counted, named, excluded from entitlements.</p> : null}
+          {ent.invariants.warnings.length ? <p className="msg" style={{ marginTop: 8, color: "var(--yellow)" }}>{ent.invariants.warnings.join(" · ")}</p> : <p className="msg green" style={{ marginTop: 8 }}>Scanned token accounts sum exactly to mint supply.</p>}
           {grouped.length ? (
             <table className="table" style={{ marginTop: 12 }}>
               <thead><tr><th>Unattributed, by label</th><th className="num">Share of supply</th></tr></thead>

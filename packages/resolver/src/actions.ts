@@ -42,7 +42,7 @@ export interface ActionRecord {
     /** Set when the entitlement set was reused from another action with the same record date. */
     reusedFrom?: string;
   };
-  onchain?: { actionPda: Base58; createTx: string; fundTx?: string; vault?: Base58 };
+  onchain?: { actionPda: Base58; createTx: string; fundTx?: string; vault?: Base58; publishedSlot?: number };
 }
 
 export const DEFAULT_ACTIONS_DIR = "apps/web/public/data/actions";
