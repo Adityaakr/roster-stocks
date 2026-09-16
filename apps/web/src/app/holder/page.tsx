@@ -151,7 +151,8 @@ export default function HolderPage() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-[28px]">Your positions, resolved</h1>
-          <p className="text-ink-2 mt-1">
+          <p className="text-ink-2 mt-1 max-w-[720px]">Everything you hold of a tokenized stock, including what sits in DeFi, and every corporate action you can act on with a proof.</p>
+          <p className="text-ink-2 mt-1 text-[14px]">
             {demo.activeLabel} <span className="num">{short(wallet, 6)}</span>{demo.isDemo ? ", signed by the demo server on the fork" : ""}. Mint AAPLx <span className="num">{short(mint, 6)}</span>.
           </p>
         </div>
@@ -175,7 +176,27 @@ export default function HolderPage() {
         </div>
       ) : null}
 
-      <section className="mt-8">
+      {data ? (
+        <section className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="panel p-5">
+            <div className="text-[13px] text-ink-2">A wallet scan sees</div>
+            <div className="num display text-[28px] mt-1">{shares(visible, 2, 2)}</div>
+            <div className="text-[13px] text-ink-3 mt-1">shares in the wallet</div>
+          </div>
+          <div className="panel p-5">
+            <div className="text-[13px] text-ink-2">Lookthrough resolves</div>
+            <div className="num display text-[28px] mt-1 text-accent">{shares(total, 2, 2)}</div>
+            <div className="text-[13px] text-ink-3 mt-1">share equivalents across wallet, Raydium and Kamino</div>
+          </div>
+          <div className="panel p-5">
+            <div className="text-[13px] text-ink-2">Open to you</div>
+            <div className="num display text-[28px] mt-1">{data.actions.filter((a) => a.inTree && !a.receipt && (a.status === "funded" || a.status === "open")).length}</div>
+            <div className="text-[13px] text-ink-3 mt-1">{data.actions.length === 0 ? "no corporate actions yet for this mint" : `of ${data.actions.length} corporate actions, positions stay where they are`}</div>
+          </div>
+        </section>
+      ) : null}
+
+      <section className="mt-6">
         {loading && !data ? <Loading what="your positions from the fork" /> : null}
         {error ? <ErrorState message={error} next="The holder page needs the fork and the registrar's data directory. Check pnpm fork and reload." /> : null}
         {data ? (

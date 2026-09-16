@@ -22,7 +22,7 @@ const fills: Record<Segment["kind"], string> = {
 export function SupplyMap({ segments, hiddenPct, symbol }: { segments: Segment[]; hiddenPct: number; symbol: string }) {
   const reduce = useReducedMotion();
   const [animated, setAnimated] = useState(false);
-  const [count, setCount] = useState(reduce ? hiddenPct : 0);
+  const [count, setCount] = useState(hiddenPct);
 
   useEffect(() => {
     // Runs once per session. React's dev StrictMode mounts twice, so the "seen" flag is set when the run completes,
@@ -39,6 +39,7 @@ export function SupplyMap({ segments, hiddenPct, symbol }: { segments: Segment[]
       return;
     }
     let raf = 0;
+    setCount(0);
     const t = setTimeout(() => {
       const start = performance.now();
       const step = (now: number) => {

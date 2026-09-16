@@ -186,7 +186,7 @@ export async function snapshot(store: ActionStore, id: string, log: Log, opts?: 
   store.writeJson(id, "tree.json", { ...tree, totalEntitlement: tree.totalEntitlement.toString() });
   const panel = supplyPanel(set);
   action.status = "snapshotted";
-  action.snapshot = { slotActual: set.snapshotSlotActual, timestamp: set.snapshotTimestamp, root: tree.root, contentHash, totalEntitlement: tree.totalEntitlement.toString(), leaves: tree.leaves.length, attributedPct: panel.attributedPct };
+  action.snapshot = { slotActual: set.snapshotSlotActual, timestamp: set.snapshotTimestamp, root: tree.root, contentHash, totalEntitlement: tree.totalEntitlement.toString(), leaves: tree.leaves.length, attributedPct: panel.attributedPct, ...(opts?.reuseFrom ? { reusedFrom: opts.reuseFrom } : {}) };
   store.save(action);
   log(`snapshot for ${id}: requested slot ${action.recordSlot}, actual ${set.snapshotSlotActual}, multiplier ${set.multiplier} (${set.multiplierSource}), accounts ${set.accountsScanned}`);
   log(`supply panel: attributed ${panel.attributedPct}%, unattributed ${panel.unattributedPct}%, double counted ${panel.doubleCounted}`);

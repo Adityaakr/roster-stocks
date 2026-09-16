@@ -35,9 +35,11 @@ test("reduced motion renders final values at once", async ({ browser }) => {
   await ctx.close();
 });
 
-test("proof page for the demo action shows the root and a download", async ({ page }) => {
-  const res = await page.goto("/actions/demo-dividend");
-  if (!res || res.status() === 404) test.skip(true, "no demo-dividend action on this machine");
+test("proof page for the latest action shows the root and a download", async ({ page, request }) => {
+  const list = (await (await request.get("/api/actions")).json()) as { actions: { id: string; snapshot?: unknown }[] };
+  const action = list.actions.find((a) => a.snapshot);
+  test.skip(!action, "no snapshotted action on this machine");
+  await page.goto(`/actions/${action!.id}`);
   await expect(page.getByText("Snapshot").first()).toBeVisible();
   await expect(page.getByRole("link", { name: /Download entitlements.json/ })).toBeVisible();
 });

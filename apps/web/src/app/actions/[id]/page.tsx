@@ -17,7 +17,7 @@ interface ActionResponse {
     recordSlot: number;
     amountPerShareMicro?: string;
     question?: string;
-    snapshot?: { slotActual: number; timestamp: number; root: string; contentHash: string; totalEntitlement: string; leaves: number; attributedPct: string };
+    snapshot?: { slotActual: number; timestamp: number; root: string; contentHash: string; totalEntitlement: string; leaves: number; attributedPct: string; reusedFrom?: string };
     onchain?: { actionPda: string; createTx: string; fundTx?: string; vault?: string };
   };
   onchain: { root: string; contentHash: string; funded: boolean; claimedTotal: string; forWeight: string; againstWeight: string; abstainWeight: string; voters: number; closed: boolean; snapshotSlot: string } | { error: string } | null;
@@ -90,6 +90,7 @@ export default function ActionPage({ params }: { params: Promise<{ id: string }>
             <>
               <Row k="Record slot requested">{slotLabel(a.recordSlot)}</Row>
               <Row k="Snapshot slot actual">{slotLabel(a.snapshot.slotActual)}</Row>
+              {a.snapshot.reusedFrom ? <div className="text-[13px] text-ink-2">Entitlement set reused from <a className="text-accent" href={`/actions/${a.snapshot.reusedFrom}`}>{a.snapshot.reusedFrom}</a>, which shares this record date. Same set, new action id, new tree.</div> : null}
               <Row k="Timestamp">{timeLabel(a.snapshot.timestamp)}</Row>
               {ent ? <Row k="Multiplier">{ent.multiplier} <span className="text-ink-3">({ent.multiplierSource})</span></Row> : null}
               {ent ? <Row k="Token accounts scanned">{ent.accountsScanned.toLocaleString("en-US")}</Row> : null}
@@ -134,7 +135,7 @@ export default function ActionPage({ params }: { params: Promise<{ id: string }>
             <span>Attributed <span className="num text-accent">{pct(ent.attributedRaw, totalRaw)}%</span></span>
             <span>Unattributed <span className="num">{pct(ent.unattributedRaw, totalRaw)}%</span></span>
             <span>Double counted <span className="num">0</span></span>
-            <span>Adapters: {ent.adaptersUsed.filter((x) => x.status === "implemented").map((x) => `${x.id} (${x.containers})`).join(", ")}</span>
+            <span>Containers looked through: {ent.adaptersUsed.filter((x) => x.status === "implemented" && x.id !== "direct").map((x) => `${x.id.replace("_", " ")} ${x.containers}`).join(", ")}</span>
           </div>
           {ent.invariants.warnings.length ? <div className="mt-2 text-warn">{ent.invariants.warnings.join("; ")}</div> : <div className="mt-2 text-ink-3">Scanned token accounts sum exactly to mint supply.</div>}
           <table className="ledger w-full mt-3 text-[13px]">

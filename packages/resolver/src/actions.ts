@@ -39,6 +39,8 @@ export interface ActionRecord {
     totalEntitlement: string;
     leaves: number;
     attributedPct: string;
+    /** Set when the entitlement set was reused from another action with the same record date. */
+    reusedFrom?: string;
   };
   onchain?: { actionPda: Base58; createTx: string; fundTx?: string; vault?: Base58 };
 }

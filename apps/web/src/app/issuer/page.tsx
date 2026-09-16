@@ -182,8 +182,9 @@ export default function IssuerPage() {
 
   return (
     <div className="pt-12">
-      <h1 className="text-[28px]">Registrar console</h1>
-      <p className="text-ink-2 mt-1 max-w-[720px]">
+      <h1 className="text-[28px]">Run a record date</h1>
+      <p className="text-ink-2 mt-1 max-w-[720px]">Pick the stock and the wrappers in scope, set the record slot, take the snapshot, publish the root, then fund the distribution or open the vote. Every registered holder can claim or vote with a proof and nobody has to leave a pool.</p>
+      <p className="text-ink-3 mt-2 text-[13px] max-w-[720px]">
         The issuer role is simulated: this console signs with a demo registrar keypair on the fork and funds distributions from a demo wallet. {demo.enabled ? "" : "Open with ?demo=1 or set DEMO_MODE=1 to enable the actions here."}
       </p>
       {error ? <div className="mt-4"><ErrorState message={error} /></div> : null}
