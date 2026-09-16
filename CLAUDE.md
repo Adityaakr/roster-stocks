@@ -99,3 +99,84 @@ Anchor program `lookthrough`: PDAs `["reg", mint, wallet]`, `["action", action_i
 - surfpool 1.0.0 has `--ci`, `--snapshot <file>` and `surfnet_exportSnapshot {"scope":"network"}`. Loading the 9,218-account export back with `--snapshot` hung surfpool before it listened (0% CPU, no log line) on 2026-09-16, so the fork restart path is: `pnpm fork`, `pnpm anchor:deploy`, `pnpm seed`, register the three wallets, `pnpm demo`. The fork's state is lost whenever the process dies; keep `pnpm fork` in its own terminal. `surfnet_timeTravel {"absoluteSlot": n}` verified.
 - Alchemy mainnet URL: point reads fine, `getProgramAccounts` and `getTokenLargestAccounts` rate-limited (429). Full scans go through the fork's datasource proxy or the public RPC.
 - `surfnet_timeTravel.absoluteTimestamp` is in milliseconds; the Clock sysvar reports seconds.
+
+## 12. Phase 5: bounty tracks (only after the main submission is confirmed)
+
+Everything in the original brief still applies: verify before assuming, real data only, phase gates, no legal-ownership claims.
+
+### 12.0 Gate and budget
+
+- Do not start until `docs/BUILD_LOG.md` records the main-track submission URL and the Phase 3 checklist passing.
+- Work on a `bounties` branch behind feature flags (`FEATURE_PRE_IPO`, `FEATURE_CASH_IN_LIEU`). `main` must keep passing the 90-second demo untouched at all times.
+- Time boxes, hard: Tessera one day, PreStocks half a day, Pyth half a day. If a box overruns, cut that track, drop it from the submit form, and log why. Bounty work never degrades the main demo.
+- Tracks we are entering: **Tessera (pre-IPO)**, **PreStocks**, **Pyth market data**. We are not entering Meteora DBC or Clawpump; do not build anything for them.
+
+### 12.1 Discovery first (half a morning, no code)
+
+1. Read the Tessera and PreStocks bounty text on the hackathon page and record any required API, SDK or attribution in `docs/BOUNTIES.md`.
+2. Tessera: from `tessera.pe` and their docs, collect every live token mint on mainnet. For each mint, fetch the account, identify the token program, and list every Token-2022 extension present (expect `TransferFeeConfig` given the published `0.2%` transfer fee; check for `TransferHook`, `PermanentDelegate`, `DefaultAccountState`). Record extensions in the registry entry.
+3. PreStocks: fetch `https://prestocks.com/api/prestocks`, document the response shape in `packages/data/prestocks/README.md`, and extract mints, symbols and any supply or price fields. Identify the token program and extensions the same way. Check whether SPACEX is still listed after its IPO; if it converted, note what happened to holders and pick a still-listed token for the demo.
+4. For every pre-IPO mint, find where it trades: Tokens API `resolve` and `markets` first; if the Tokens API does not index it, look up Meteora and Raydium pools by mint directly. Record pool addresses and the AMM program so the existing adapters can be pointed at them.
+5. Write a **rights profile** per pre-IPO mint into the registry, with a source link for each field:
+
+```ts
+rights: {
+  vote: false,                 // loan participation rights, not equity (Tessera); economic exposure only (PreStocks)
+  cashDistribution: true,      // liquidity-event proceeds
+  conversion: 'liquidity_event',
+  redemption: 'kyc_only' | 'none',
+  legalForm: 'spv_loan_participation' | 'spv_economic_exposure',
+  sources: string[]
+}
+```
+
+Stop and confirm the discovery results with the user before writing code.
+
+### 12.2 Transfer-fee-aware invariant (Tessera prerequisite, also correct for any fee mint)
+
+Token-2022 transfer fees are withheld inside token accounts (`withheld_amount`) and can be harvested to the mint. They are part of supply but not part of any holder's `amount`.
+
+- Supply conservation becomes: `Σ account.amount + Σ account.withheld_amount + mint.withheld_amount == mint.supply`. Fail the snapshot if it does not hold.
+- Entitlements use `amount` only. Withheld fees belong to the fee authority; show them as a separate line, "Fees withheld (issuer)", in the invariant panel and in `snapshot.json` as `withheldTotal`.
+- Add a unit test with a fee mint fixture where the naive sum is short by the withheld total and the corrected sum reaches `100.0%`.
+- If a `TransferHook` is present, record that DeFi positions may be restricted to approved programs and keep unattributed handling as is.
+
+### 12.3 Liquidity-event distribution (Tessera and PreStocks)
+
+Pre-IPO tokens have one corporate action that matters: proceeds from an IPO, a secondary sale or an SPV wind-down reaching every holder, including holders inside pools. This is a `Distribution` in the existing program; no on-chain changes.
+
+- Issuer console: add an action template "Liquidity event proceeds" with fields for event name, source link, and `usdc_per_token`. It is labelled "issuer-declared" and "simulated" in the demo.
+- Resolver: same Direct plus AMM adapters, pointed at the discovered pools, with the fee-aware invariant on.
+- Holder view: for assets whose rights profile has `vote: false`, hide the vote action entirely and show the rights profile badges instead ("No voting rights", "Cash distributions", "Converts at liquidity event"). Do not demo a vote on a pre-IPO token under any circumstances.
+- Demo: a wallet holding one Tessera token directly and inside a pool, a declared proceeds event, snapshot with the withheld-fee line visible, publish, claim. Repeat with one PreStocks token. Record both.
+
+Done when: both tokens resolve on the fork with the corrected invariant at `100.0%`, both proceeds actions run end to end, the vote action is absent for both, and `docs/BOUNTIES.md` has a screenshot per track.
+
+### 12.4 Pyth cash in lieu (`FEATURE_CASH_IN_LIEU`)
+
+Non-cash actions (stock dividends, reverse splits, spin-offs) pay cash for fractional entitlements at the market price on the record date. Implement this without changing the program.
+
+- Pricing source: Pyth. Verify in the Pyth docs the exact call to fetch a price at a given timestamp (the Benchmarks historical endpoint) and the feed IDs for the demo equities; record feed IDs in `packages/data/pyth/feeds.ts` with links. Use Hermes for a live price only for display.
+- Session rule: Pyth equity feeds are marked closed outside exchange hours, and Pyth Pro is what covers pre-market through overnight on weekdays. Therefore the record slot for any cash-in-lieu action must fall inside a regular session. Default the record date from Pyth's published market-hours metadata for the feed if available; fall back to Backpack `/market-sessions`. Refuse to schedule a cash-in-lieu record slot on a weekend or holiday, with a clear error.
+- Computation, in the resolver: for a declared ratio (for example a `1:10` reverse split), whole resulting share-equivalents stay in-kind (out of scope on-chain; recorded in the JSON), and the fractional remainder is priced at the Pyth price at the snapshot timestamp: `cash = fraction × price × ratio_adjustment`, in USDC micro-units.
+- On-chain trick: publish it as a `Distribution` with `usdc_per_share_1e6 = 1_000_000` (the identity rate) and put the per-wallet USDC amount in the leaf's `entitlement` field. Document this "amount-based distribution" mode in `docs/ARCHITECTURE.md`. Add a resolver test that the identity-rate leaf pays exactly the computed cash.
+- Holder view line item: "`3.4` fractional shares × Pyth `$182.11` at slot `N` = `$619.17`", with the Pyth feed ID and timestamp shown on the action page so it is auditable.
+
+Done when: one cash-in-lieu action runs end to end on the fork for AAPLx with a Pyth-priced fraction, the weekend refusal is tested, and the README's Pyth section lists feed IDs, the timestamp query and the session rule.
+
+### 12.5 Submission and README additions
+
+- Submit form: select Tessera, PreStocks and Pyth. Two-line blurb per track:
+  - Tessera: "Record-date look-through for T-tokens held inside DEX pools, with a transfer-fee-aware supply invariant and a liquidity-event proceeds distribution that pays pool-held holders without unwinding."
+  - PreStocks: "Registry, rights profile and liquidity-event distribution for PreStocks tokens sourced from the PreStocks API, resolved through wallet and pool positions."
+  - Pyth: "Cash in lieu for fractional entitlements priced at the Pyth price at the record timestamp, with record dates constrained to Pyth-published sessions."
+- README: a "Pre-IPO assets" section with the rights profiles and their sources, the fee-aware invariant explained in three lines, the Pyth section, and the same disclaimer as everywhere else: issuer-defined entitlements, not legal ownership, and proceeds events in the demo are simulated.
+- `docs/BUILD_LOG.md`: what each track added, what was cut, and time spent against the boxes.
+
+### 12.6 Outreach hook (not code, do not skip)
+
+The moment the Tessera demo runs, produce a shareable action page link and a 20-second clip. The user sends it to Tessera the same day. Put the link and clip path in `docs/BOUNTIES.md`.
+
+### Kickoff for Phase 5 (the user pastes this after confirming the main submission is in)
+
+> Read section 12 of `CLAUDE.md`. Do the discovery in 12.1 only: bounty text requirements, every Tessera and PreStocks mint with its token program and extensions, where each trades, the PreStocks API response shape, SPACEX's post-IPO status, and a rights profile per mint with sources. Produce the discovery report in `docs/BOUNTIES.md` and stop. Do not write adapter or resolver code until the user confirms.
