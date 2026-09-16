@@ -23,6 +23,8 @@ function publicEnv(): Record<string, string> {
 
 const nextConfig: NextConfig = {
   agentRules: false,
+  // Next 16 allows one dev server per build directory, so the devnet profile uses its own (NEXT_DIST_DIR=.next-devnet).
+  distDir: process.env.NEXT_DIST_DIR ?? ".next",
   env: publicEnv(),
   transpilePackages: ["@lookthrough/core", "@lookthrough/datasources", "@lookthrough/adapters", "@lookthrough/resolver", "@lookthrough/sdk", "@lookthrough/registrar"],
   serverExternalPackages: ["@raydium-io/raydium-sdk-v2", "@kamino-finance/klend-sdk", "@solana/kit", "@anchor-lang/core"],

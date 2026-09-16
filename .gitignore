@@ -5,6 +5,7 @@
 !.env.devnet.example
 .keys/
 .next/
+.next-devnet/
 .prism/runs/
 .turbo/
 *.log

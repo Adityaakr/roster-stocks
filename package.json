@@ -26,7 +26,7 @@
     "anchor:deploy": "bash scripts/anchor-deploy.sh",
     "smoke": "bash scripts/smoke.sh",
     "seed:devnet": "LOOKTHROUGH_ENV=devnet tsx scripts/seed-devnet.ts",
-    "dev:devnet": "LOOKTHROUGH_ENV=devnet pnpm --filter @lookthrough/web exec next dev -p 3001",
+    "dev:devnet": "LOOKTHROUGH_ENV=devnet NEXT_DIST_DIR=.next-devnet pnpm --filter @lookthrough/web exec next dev -p 3001",
     "registrar:devnet": "LOOKTHROUGH_ENV=devnet tsx scripts/run-snapshot.ts"
   },
   "devDependencies": {
