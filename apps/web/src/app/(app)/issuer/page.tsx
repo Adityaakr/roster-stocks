@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useDemoWallet } from "@/lib/demo-wallet";
 import { explorerUrl, useCluster } from "@/lib/cluster";
 import { pct, shares, short, slotLabel, usdc } from "@/lib/format";
@@ -59,6 +60,14 @@ const STEPS: { n: Step; t: string }[] = [
 ];
 
 export default function IssuerPage() {
+  return (
+    <Suspense fallback={null}>
+      <IssuerConsole />
+    </Suspense>
+  );
+}
+
+function IssuerConsole() {
   const demo = useDemoWallet();
   const cluster = useCluster();
   const devnet = cluster.cluster === "devnet";
@@ -90,6 +99,29 @@ export default function IssuerPage() {
   useEffect(() => {
     if (!mint && defaultMint) setMint(defaultMint);
   }, [defaultMint, mint]);
+
+  // ?action=<id> reopens an existing record in the console at its current step.
+  const params = useSearchParams();
+  const reopen = params.get("action");
+  useEffect(() => {
+    if (!reopen) return;
+    fetch(`/api/actions/${reopen}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then(async (j: { action: ActionRecord } | null) => {
+        if (!j) return;
+        setAction(j.action);
+        setMint((m) => m || (j.action as unknown as { mint?: string }).mint || m);
+        setKind(j.action.kind);
+        if (j.action.snapshot) {
+          const e = await fetch(`/actions/${j.action.id}/entitlements.json`).then((r) => (r.ok ? r.json() : null));
+          setEntitlements(e as Entitlements | null);
+          setJob({ id: "reopened", status: "done", lines: [], progress: {} });
+        }
+        const wanted = Number(params.get("step"));
+        setStep(wanted >= 1 && wanted <= 5 ? (wanted as Step) : j.action.onchain ? 5 : j.action.snapshot ? 3 : 2);
+      })
+      .catch(() => undefined);
+  }, [reopen, params]);
 
   const doSearch = useCallback(async () => {
     if (devnet) return;
@@ -351,7 +383,7 @@ export default function IssuerPage() {
               {action && !action.snapshot ? (
                 <div className="btnrow" style={{ marginTop: 16 }}><button className="btn primary" onClick={runSnapshot} disabled={busy}>{busy ? "Snapshotting" : "Snapshot holders"}</button>{waiting ? <span className="small">Slot <M>{slotLabel(waiting.target)}</M> is not final yet. Try again in about <M>{waiting.seconds}</M> seconds.</span> : null}</div>
               ) : null}
-              {job ? (
+              {job && job.lines.length ? (
                 <div className="log" style={{ marginTop: 16 }}>
                   {job.lines.slice(-30).map((l, i) => (
                     <div key={`${i}-${l.slice(0, 24)}`}>

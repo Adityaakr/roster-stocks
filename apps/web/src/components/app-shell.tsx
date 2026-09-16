@@ -45,7 +45,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </nav>
         <div className="foot mt-auto small" style={{ padding: "0 10px" }}>
           <div className="flex items-center gap-2">
-            <Badge tone={cluster.rpcReachable ? "green" : "red"} dot>{cluster.label}</Badge>
+            <Badge tone={cluster.rpcReachable ? "green" : "amber"} dot>{cluster.label}</Badge>
           </div>
           <p className="mt-3" style={{ margin: "12px 0 0" }}>{cluster.cluster === "devnet" ? "Program deployed on Solana devnet. Demo stock and test USDC mints; no real value." : "surfpool fork of mainnet. Real mints, pools and reserves; simulated issuer."}</p>
         </div>
@@ -56,6 +56,8 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span>Lookthrough</span>
             <span>/</span>
             <b>{CRUMB[first] ?? first}</b>
+            <span>·</span>
+            <Badge tone={cluster.rpcReachable ? "green" : "amber"} dot>{cluster.label}</Badge>
           </div>
           <WalletMenu />
         </header>

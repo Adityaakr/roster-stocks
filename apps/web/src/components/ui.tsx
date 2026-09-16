@@ -13,7 +13,7 @@ export function Label({ children, tone = "blue" }: { children: ReactNode; tone?:
   );
 }
 
-export function Badge({ children, tone, dot }: { children: ReactNode; tone?: "green" | "yellow" | "blue" | "red" | "purple"; dot?: boolean }) {
+export function Badge({ children, tone, dot }: { children: ReactNode; tone?: "green" | "yellow" | "amber" | "blue" | "red" | "purple" | "accent"; dot?: boolean }) {
   return (
     <span className={`badge ${tone ?? ""}`}>
       {dot ? <i /> : null}

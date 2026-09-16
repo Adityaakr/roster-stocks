@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 /** Every page renders, shows its key copy, and logs no console errors. Screenshots land in e2e/screenshots. */
 const pages = [
-  { path: "/?demo=1", heading: "Your shares went into DeFi. The register lost you.", level: 1, name: "landing", wait: "input[aria-label=\"Wallet public key\"]" },
+  { path: "/?demo=1", heading: "Your shares went into DeFi. The register lost you.", level: 1, name: "landing", wait: "#check-input" },
   { path: "/portfolio?demo=1", heading: "Portfolio", level: 1, name: "portfolio", wait: "table.table, [role=alert]" },
   { path: "/assets", heading: "Assets", level: 1, name: "assets", wait: ".asset-card, [role=alert]" },
   { path: "/assets/apple", heading: /Apple/, level: 1, name: "asset", wait: ".chart svg, .msg.red, [role=alert]" },
@@ -30,17 +30,22 @@ test("the wallet check resolves the demo wallet in place", async ({ page, reques
   const s = (await (await request.get("/api/demo/summary")).json()) as { live?: boolean; wallet?: string };
   test.skip(!s.live || !s.wallet, "chain not reachable or not seeded");
   await page.goto("/");
-  await page.getByLabel("Wallet public key").fill(s.wallet!);
-  await page.getByRole("button", { name: "Check a wallet" }).click();
-  await expect(page.getByText(/A wallet scan sees/)).toBeVisible({ timeout: 60_000 });
-  await expect(page.getByText(/Read at slot/)).toBeVisible();
+  await page.locator("#check-input").fill(s.wallet!);
+  await page.locator("#check form button[type=submit]").click();
+  await expect(page.locator("#check").getByText(/A wallet scan sees/)).toBeVisible({ timeout: 60_000 });
+  await expect(page.locator("#check").getByText(/Read at slot/)).toBeVisible();
+  await expect(page.locator("#check").getByText("Share equivalents")).toBeVisible();
 });
 
 test("the number block prints the measured values from the visibility scan", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: /One in three SPYx shares/ })).toBeVisible();
-  const pct = await page.locator(".h1.num").first().textContent();
+  await expect(page.getByRole("heading", { name: /One in three SPYx shares/ })).toBeAttached();
+  await page.locator("#number").scrollIntoViewIfNeeded();
+  await page.waitForTimeout(2500);
+  const pct = await page.locator("#number .counter .v").first().textContent();
   expect(pct).toMatch(/^\d+\.\d{2}%$/);
+  const html = await page.content();
+  expect(html.includes("\u2014"), "no em dashes in the rendered page").toBe(false);
 });
 
 test("assets directory opens an asset with a chart and its wrappers", async ({ page, request }) => {

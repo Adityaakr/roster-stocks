@@ -161,7 +161,7 @@ export default function AssetPage({ params }: { params: Promise<{ assetId: strin
                     <div className="flex items-center gap-3">
                       <Logo src={v.market?.logoURI ?? a.imageUrl} symbol={v.symbol ?? a.symbol} size="sm" />
                       <div>
-                        <div style={{ fontWeight: 500 }}>{v.symbol ?? v.name ?? "wrapper"}{v.mint === LOOKTHROUGH_MINT ? <Badge tone="green"> demo mint</Badge> : null}</div>
+                        <div style={{ fontWeight: 500 }}>{v.symbol ?? v.name ?? "wrapper"}{v.mint === LOOKTHROUGH_MINT ? <Badge tone="green"> sample mint</Badge> : null}</div>
                         <div className="small">{v.label ?? ""}{v.issuer ? ` · ${v.issuer}` : ""}</div>
                       </div>
                     </div>

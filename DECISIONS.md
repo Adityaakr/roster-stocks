@@ -40,3 +40,8 @@ Dated log of non-obvious choices, with the alternative rejected.
 - Citation links come from the spec's appendix plus two SEC URLs and the Broadridge and DTCC pages found on the day; nothing is linked that was not checked. The Ondo and Broadridge entry links the MetaMask write-up named in the appendix.
 - Headline share figures in the hero round half up (a 34.999999 Raydium estimate reads 35.00) so the three figures add up; ledgers keep truncation.
 - Product microcopy follows the spec: claim and cast buttons carry the amount, receipts carry the slot and transaction, the issuer console says "Snapshot holders" and "Publish record" and reports the slot, the record page can recompute the root from the published leaves and states the unattributed share as counted, named and excluded.
+
+## 2026-09-16, evening: the landing is the Aoutive template with our content
+
+- The user asked for the Aoutive Framer template exactly, light theme, motions included. The page now mirrors its home page section for section and carries the v3 copy: hero with the word-by-word blur reveal and the pixel-mask product shot, brand strip of the sources, tab cards that swap the image, an accordion that cycles every six seconds, 2+3 use-case cards, count-up counters, the statements, three plan-style audience columns, boxed FAQ with one answer open, CTA. Smooth scrolling comes from Lenis, standing in for the template's Smooth Scroll component.
+- The template's isometric illustrations are used in the use-case cards, the accordion and the CTA because the layout depends on them; every product slot (hero, workflow tabs, the last accordion item) shows our own screenshots or SVG. The v4 dark brief's palette is superseded by this instruction; its measured-figure rules still hold.

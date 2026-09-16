@@ -32,7 +32,7 @@ export function WalletMenu() {
       <div className="btnrow">
         {demo.enabled && demo.wallets.length ? (
           <button className="btn secondary sm" onClick={() => demo.select("alice")}>
-            Use demo wallet
+            Use a sample wallet
           </button>
         ) : null}
         <button className="btn primary sm" onClick={() => setVisible(true)}>
@@ -46,14 +46,14 @@ export function WalletMenu() {
     <div ref={ref} className="relative">
       <button className="btn secondary sm" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
         <span className="inline-block w-2 h-2 rounded-full" style={{ background: demo.isDemo ? "var(--yellow)" : "var(--green)" }} />
-        {demo.isDemo ? `${demo.selected} (demo)` : short(active, 4)}
+        {demo.isDemo ? `${demo.selected} (sample)` : short(active, 4)}
         <Icon.Chevron width={14} height={14} />
       </button>
       {open ? (
         <div className="menu" role="menu">
           <div className="px-2.5 py-2 small">
             <div className="mono" style={{ color: "var(--text)" }}>{short(active, 8)}</div>
-            <div>{demo.isDemo ? "Server-signed demo wallet" : wallet?.adapter.name ?? "Browser wallet"} on {cluster.label}</div>
+            <div>{demo.isDemo ? "Sample wallet, signed by the server" : wallet?.adapter.name ?? "Browser wallet"} on {cluster.label}</div>
           </div>
           <div className="sep" />
           <button role="menuitem" onClick={() => navigator.clipboard.writeText(active).catch(() => undefined)}>Copy address</button>
@@ -65,7 +65,7 @@ export function WalletMenu() {
           {demo.enabled && demo.wallets.length ? (
             <>
               <div className="sep" />
-              <div className="px-2.5 pt-1 pb-1 small">Demo wallets (signed by the server)</div>
+              <div className="px-2.5 pt-1 pb-1 small">Sample wallets, signed by the server</div>
               {demo.wallets.map((w) => (
                 <button key={w.name} role="menuitem" onClick={() => { demo.select(w.name); setOpen(false); }}>
                   <span>{w.name[0]?.toUpperCase() + w.name.slice(1)}</span>
@@ -85,7 +85,7 @@ export function WalletMenu() {
           ) : (
             <button role="menuitem" onClick={() => { setVisible(true); setOpen(false); }}>Connect a browser wallet</button>
           )}
-          {demo.isDemo && !publicKey ? <button role="menuitem" onClick={() => { demo.select(null); setOpen(false); }}>Leave demo wallet</button> : null}
+          {demo.isDemo && !publicKey ? <button role="menuitem" onClick={() => { demo.select(null); setOpen(false); }}>Leave sample wallet</button> : null}
         </div>
       ) : null}
     </div>

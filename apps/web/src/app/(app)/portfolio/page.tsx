@@ -159,7 +159,7 @@ export default function PortfolioPage() {
       const res = await fetch("/api/devnet/faucet", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ wallet }) });
       const j = (await res.json()) as { error?: string; shares?: number; signature?: string };
       if (!res.ok) throw new Error(j.error ?? `HTTP ${res.status}`);
-      say(`Minted ${j.shares} demo shares to this wallet. Transaction ${short(j.signature ?? "", 6)}.`);
+      say(`Minted ${j.shares} sample shares to this wallet. Transaction ${short(j.signature ?? "", 6)}.`);
       await load();
     } catch (err) {
       say(err instanceof Error ? err.message : String(err), "red");
@@ -187,11 +187,11 @@ export default function PortfolioPage() {
         </div>
         <Empty
           title="No wallet connected."
-          action={cluster.cluster === "devnet" ? "Connect a Solana wallet set to devnet, or use a demo wallet signed by the server." : "Use a demo wallet, or connect your own to read its positions on the fork."}
+          action={cluster.cluster === "devnet" ? "Connect a Solana wallet set to devnet, or use a sample wallet signed by the server." : "Use a sample wallet, or connect your own to read its positions on the fork."}
           cta={
             <>
               <button className="btn primary" onClick={() => setVisible(true)}>Connect wallet</button>
-              {demo.enabled && demo.wallets.length ? <button className="btn secondary" onClick={() => demo.select("alice")}>Use demo wallet</button> : null}
+              {demo.enabled && demo.wallets.length ? <button className="btn secondary" onClick={() => demo.select("alice")}>Use a sample wallet</button> : null}
             </>
           }
         />
@@ -205,12 +205,12 @@ export default function PortfolioPage() {
         <div>
           <h1 className="h3">Portfolio</h1>
           <p className="body-sm">
-            {demo.isDemo ? `${demo.selected?.[0]?.toUpperCase()}${demo.selected?.slice(1)}, a demo wallet signed by the server` : "Your wallet"} · <span className="mono">{short(wallet, 6)}</span> · {name} ({symbol})
+            {demo.isDemo ? `${demo.selected?.[0]?.toUpperCase()}${demo.selected?.slice(1)}, a sample wallet signed by the server` : "Your wallet"} · <span className="mono">{short(wallet, 6)}</span> · {name} ({symbol})
           </p>
         </div>
         <div className="btnrow">
           {cluster.faucet ? (
-            <button className="btn secondary" onClick={faucet} disabled={busy !== null}>{busy === "faucet" ? "Minting" : "Get demo shares"}</button>
+            <button className="btn secondary" onClick={faucet} disabled={busy !== null}>{busy === "faucet" ? "Minting" : "Get sample shares"}</button>
           ) : null}
           {data && !data.registration.registered ? (
             <button className="btn primary" disabled={busy !== null} onClick={() => act("register")}>{busy === "register:" ? "Registering" : "Register for corporate actions"}</button>
@@ -249,7 +249,7 @@ export default function PortfolioPage() {
                   {rows.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="muted">
-                        No tokenized stock in this wallet. Connect one that holds a position, or <Link href="/assets" style={{ borderBottom: "1px solid var(--line-strong)" }}>browse the directory</Link>.{cluster.faucet ? " On devnet, Get demo shares mints some." : ""}
+                        No tokenized stock in this wallet. Connect one that holds a position, or <Link href="/assets" style={{ borderBottom: "1px solid var(--line-strong)" }}>browse the directory</Link>.{cluster.faucet ? " On devnet, Get sample shares mints some." : ""}
                       </td>
                     </tr>
                   ) : null}
