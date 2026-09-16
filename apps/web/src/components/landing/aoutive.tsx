@@ -58,8 +58,8 @@ export function HeroAoutive() {
       <div style={{ padding: "80px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: 18 }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 40, overflow: "clip" }}>
           <div style={{ maxWidth: 673, display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
-            <WordReveal as="h1" text="Your shares went into DeFi. The register lost you." className="display" delay={0.6} stagger={0.05} style={{ textAlign: "center" }} />
-            <WordReveal as="p" text="Lookthrough finds every holder behind every pool and vault at the record date, proves it with one root on Solana, and lets them claim and vote with a proof. The stock never has to move." className="body" delay={1} stagger={0.03} style={{ textAlign: "center", maxWidth: 635 }} />
+            <WordReveal as="h1" text="The pool got your dividend." className="display" delay={0.6} stagger={0.05} style={{ textAlign: "center" }} />
+            <WordReveal as="p" text="You put a tokenized stock into DeFi. On the record date, the company looked up the shareholder and found a smart contract. Lookthrough finds the person behind the program, proves it with one root on Solana, and pays and polls them where their shares sit. Nothing has to move." className="body" delay={1} stagger={0.03} style={{ textAlign: "center", maxWidth: 635 }} />
           </div>
           <div className="btnrow" style={{ justifyContent: "center", gap: 10 }}>
             <MountReveal delay={2} y={20}><a href="#check" className="btn primary"><Roll>Check a wallet</Roll></a></MountReveal>
@@ -280,7 +280,7 @@ export function Connect({ data }: { data: LandingData }) {
         <Image src={IMG.connectBg} alt="" width={1224} height={891} unoptimized aria-hidden style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.9, pointerEvents: "none" }} />
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", position: "relative" }}>
           <Reveal y={18} style={{ width: "100%" }}><p className="body" style={{ margin: 0, color: "var(--ink-2)", textAlign: "center" }}>The problem, told the way it happens</p></Reveal>
-          <ScrollColorText as="h2" text="The pool got your dividend." className="h-section" style={{ maxWidth: 697, textAlign: "center" }} />
+          <ScrollColorText as="h2" text="Two statements, one dividend." className="h-section" style={{ maxWidth: 697, textAlign: "center" }} />
         </div>
         <Reveal y={48} style={{ width: "100%", maxWidth: 1110, position: "relative" }}>
           <div style={{ background: "#fff", border: "1px solid var(--line)", padding: 24 }}><Statements data={data} /></div>

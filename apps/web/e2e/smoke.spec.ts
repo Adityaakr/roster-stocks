@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 /** Every page renders, shows its key copy, and logs no console errors. Screenshots land in e2e/screenshots. */
 const pages = [
-  { path: "/?demo=1", heading: "Your shares went into DeFi. The register lost you.", level: 1, name: "landing", wait: "#check-input" },
+  { path: "/?demo=1", heading: "The pool got your dividend.", level: 1, name: "landing", wait: "#check-input" },
   { path: "/portfolio?demo=1", heading: "Portfolio", level: 1, name: "portfolio", wait: "table.table, [role=alert]" },
   { path: "/assets", heading: "Assets", level: 1, name: "assets", wait: ".asset-card, [role=alert]" },
   { path: "/assets/apple", heading: /Apple/, level: 1, name: "asset", wait: ".chart svg, .msg.red, [role=alert]" },
