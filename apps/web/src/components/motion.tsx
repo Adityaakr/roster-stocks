@@ -180,3 +180,51 @@ export function Stagger({ children, step = 0.08, base = 0, className, once = tru
     </div>
   );
 }
+
+/**
+ * Ticker (Aoutive tickerEffect): the row scrolls left at `velocity` px/s and slows to `hoverModifier`% on hover.
+ * The children are duplicated so the loop is seamless; off under reduced motion.
+ */
+export function Ticker({ children, velocity = 50, hoverModifier = 40, gap = 48, className }: { children: ReactNode; velocity?: number; hoverModifier?: number; gap?: number; className?: string }) {
+  const track = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
+  const hover = useRef(false);
+  useEffect(() => {
+    if (reduce) return;
+    const el = track.current;
+    if (!el) return;
+    let x = 0;
+    let last = performance.now();
+    let raf = 0;
+    const tick = (t: number) => {
+      const dt = (t - last) / 1000;
+      last = t;
+      const v = velocity * (hover.current ? hoverModifier / 100 : 1);
+      x -= v * dt;
+      const half = el.scrollWidth / 2;
+      if (half > 0 && -x >= half) x += half;
+      el.style.transform = `translate3d(${x.toFixed(2)}px, 0, 0)`;
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [velocity, hoverModifier, reduce]);
+  return (
+    <div className={className} style={{ overflow: "hidden", width: "100%" }} onMouseEnter={() => { hover.current = true; }} onMouseLeave={() => { hover.current = false; }}>
+      <div ref={track} style={{ display: "flex", gap, width: "max-content", willChange: "transform" }}>
+        <div style={{ display: "flex", gap, alignItems: "center" }}>{children}</div>
+        <div style={{ display: "flex", gap, alignItems: "center" }} aria-hidden>{children}</div>
+      </div>
+    </div>
+  );
+}
+
+/** Slide in from the side on first view (Aoutive styleTransformEffect: x ±290 → 0, spring 300/100). */
+export function SlideIn({ children, x = 0, y = 0, className }: { children: ReactNode; x?: number; y?: number; className?: string }) {
+  const reduce = useReducedMotion();
+  return (
+    <motion.div className={className} initial={reduce ? false : { x, y }} whileInView={{ x: 0, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ type: "spring", stiffness: 300, damping: 100, mass: 1 }}>
+      {children}
+    </motion.div>
+  );
+}

@@ -363,7 +363,7 @@ select.field { appearance: none; padding-right: 28px; background-image: linear-g
 .btn .arrow { font-family: var(--sans); }
 
 /* Brand strip */
-.brandwrap { display: flex; gap: 48px; align-items: center; width: 100%; max-width: 1157px; overflow: hidden; white-space: nowrap; position: relative; }
+.brandwrap { width: 100%; max-width: 1157px; position: relative; white-space: nowrap; mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
 .brand { font-family: var(--display); font-weight: 500; font-size: 18px; color: var(--ink-2); letter-spacing: -0.02em; flex: none; }
 .brandbg { position: absolute; left: 0; right: 0; top: 50%; height: 44%; background: repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 48px); opacity: 0.5; pointer-events: none; }
 

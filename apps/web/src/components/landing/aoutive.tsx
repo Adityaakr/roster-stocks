@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { CountUp, MountReveal, PixelReveal, Reveal, Roll, ScrollColorText, WordReveal } from "@/components/motion";
+import { CountUp, MountReveal, PixelReveal, Reveal, Roll, ScrollColorText, SlideIn, Ticker, WordReveal } from "@/components/motion";
 import { slotLabel, usdc, short } from "@/lib/format";
 import type { LandingData } from "@/lib/landing-data";
 import { Quadrant } from "./false-choice";
@@ -15,11 +15,11 @@ import { SOURCES } from "./evidence";
  * The Aoutive home page, section by section, carrying Lookthrough's content.
  *   Hero: word reveal headline (0.6 s, 0.05 s per word) and sub (1 s, 0.03 s), buttons at 2.0 s and 2.1 s,
  *         image wrap at 2.8 s with a 24-cell pixel mask reveal over 3 s.
- *   Brand: info text fades up on view; the logo row sits under a faint background.
+ *   Brand: info text fades up on view; the logo row is a ticker at 50 px/s that slows to 40% on hover.
  *   Workflow: headline colours in on scroll; four cards fade up at 0, 0.1, 0.2, 0.3 s; clicking a card swaps the
  *         image on the right with a 0.3 s linear tween; the active card is white with a hairline.
  *   Automation: accordion on the left, image on the right; the open item cycles every 6 s; spring 0.6 s.
- *   Use cases: 2 + 3 cards, each with an image, fading up in sequence.
+ *   Use cases: the two large cards slide in from the centre (x ±290, spring 300/100); the three below fade up in sequence.
  *   Counters: four cells counting up on view, staggered 0.1 s.
  *   Connect: centred headline, image with the pixel mask reveal, faint background image.
  *   Plans: three hairline columns fading up at 0, 0.1, 0.2 s.
@@ -85,9 +85,11 @@ export function BrandStrip() {
         <Reveal y={15} style={{ width: "100%" }}><p className="body" style={{ margin: 0, textAlign: "left", color: "var(--ink-2)" }}>Named in the record this year by</p></Reveal>
         <div className="brandbg" aria-hidden />
         <div className="brandwrap">
-          {names.map(([n, href]) => (
-            <a key={n} href={href} target="_blank" rel="noreferrer" className="brand">{n}</a>
-          ))}
+          <Ticker velocity={50} hoverModifier={40} gap={48}>
+            {names.map(([n, href]) => (
+              <a key={n} href={href} target="_blank" rel="noreferrer" className="brand">{n}</a>
+            ))}
+          </Ticker>
         </div>
       </div>
     </Sec>
@@ -218,11 +220,13 @@ export function UseCases() {
         <div style={{ display: "flex", flexDirection: "column", gap: 14, width: "100%" }}>
           <div className="ucrow">
             {cards.filter((c) => c.big).map((c, j) => (
-              <Reveal key={c.t} y={40} delay={j * 0.1} className="ucard big">
-                <div className="img"><Image src={c.img} alt="" width={1000} height={529} unoptimized style={{ width: "100%", height: 263, objectFit: "contain", display: "block" }} /></div>
-                <div className="t">{c.t}</div>
-                <div className="d">{c.d}</div>
-              </Reveal>
+              <SlideIn key={c.t} x={j === 0 ? 290 : -290}>
+                <div className="ucard big">
+                  <div className="img"><Image src={c.img} alt="" width={1000} height={529} unoptimized style={{ width: "100%", height: 263, objectFit: "contain", display: "block" }} /></div>
+                  <div className="t">{c.t}</div>
+                  <div className="d">{c.d}</div>
+                </div>
+              </SlideIn>
             ))}
           </div>
           <div className="ucrow three">
