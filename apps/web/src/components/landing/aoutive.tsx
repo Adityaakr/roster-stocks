@@ -7,6 +7,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { CountUp, MountReveal, PixelReveal, Reveal, Roll, ScrollColorText, SlideIn, Ticker, WordReveal } from "@/components/motion";
 import { slotLabel, usdc, short } from "@/lib/format";
 import type { LandingData } from "@/lib/landing-data";
+import { BeforeAfter } from "./before-after";
 import { FourColumns, Quadrant } from "./false-choice";
 import { Statements } from "./statements";
 import { SOURCES } from "./evidence";
@@ -19,6 +20,7 @@ import { SOURCES } from "./evidence";
  *   Workflow: headline colours in on scroll; four cards fade up at 0, 0.1, 0.2, 0.3 s; clicking a card swaps the
  *         image on the right with a 0.3 s linear tween; the active card is white with a hairline.
  *   Automation: accordion on the left, image on the right; the open item cycles every 6 s; spring 0.6 s.
+ *   Before and after: header and five stage rows fade up in sequence, 0.1 s apart, then the outcome strip.
  *   Use cases: the two large cards slide in from the centre (x ±290, spring 300/100); the three below fade up in sequence.
  *   Counters: four cells counting up on view, staggered 0.1 s.
  *   Connect: centred headline, image with the pixel mask reveal, faint background image.
@@ -160,6 +162,24 @@ export function ChoiceTable() {
         </div>
       </div>
       <style>{`@media (max-width: 809px) { .automation .two { grid-template-columns: minmax(0, 1fr) !important; gap: 24px !important; padding: 0 18px !important; } }`}</style>
+    </Sec>
+  );
+}
+
+/* 4a. Before and after: the same record date, run twice */
+export function BeforeAfterSection({ data }: { data: LandingData }) {
+  return (
+    <Sec id="before-after" className="ba-sec">
+      <div style={{ padding: "80px 30px", display: "flex", flexDirection: "column", alignItems: "center", gap: 60 }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%" }}>
+          <Reveal y={18} style={{ width: "100%" }}><p className="body" style={{ margin: 0, textAlign: "center", color: "var(--ink-2)" }}>Before and after</p></Reveal>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
+            <ScrollColorText as="h2" text="The same record date, run twice." className="h-section" style={{ maxWidth: 900, textAlign: "center" }} />
+            <Reveal y={18} delay={0.2}><p className="body" style={{ margin: 0, maxWidth: 672, textAlign: "center" }}>One holder, one dividend, one vote. On the left, the day as it runs now once the shares sit inside a pool and a lending market. On the right, the same day with the same positions, resolved.</p></Reveal>
+          </div>
+        </div>
+        <div style={{ width: "100%" }}><BeforeAfter data={data} /></div>
+      </div>
     </Sec>
   );
 }

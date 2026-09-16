@@ -42,6 +42,20 @@ test("the wallet check resolves the sample wallet in place", async ({ page, requ
   }
 });
 
+test("before and after pairs every stage of the record date", async ({ page }) => {
+  await page.goto("/");
+  const sec = page.locator("#before-after");
+  await sec.scrollIntoViewIfNeeded();
+  // The column titles are in the header on desktop and on each cell on phones, so assert the text, not one node.
+  await expect(sec).toContainText("Without Lookthrough");
+  await expect(sec).toContainText("With Lookthrough");
+  await expect(sec.locator(".ba-step").first()).toBeVisible();
+  // Each stage appears once in the spine and gets a verdict on both sides.
+  await expect(sec.locator(".ba-step")).toHaveCount(5);
+  await expect(sec.locator(".ba-cell.before .ba-mark")).toHaveCount(5);
+  await expect(sec.locator(".ba-cell.after .ba-mark")).toHaveCount(5);
+});
+
 test("the number block prints the measured values from the visibility scan", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: /One in three SPYx shares/ })).toBeAttached();

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SiteFooter } from "@/components/site-chrome";
 import { SmoothScroll } from "@/components/smooth-scroll";
-import { BrandStrip, ChoiceTable, Connect, Counters, CtaAoutive, EvidenceAccordion, FaqAoutive, HeroAoutive, Plans, UseCases, WorkflowTabs } from "@/components/landing/aoutive";
+import { BeforeAfterSection, BrandStrip, ChoiceTable, Connect, Counters, CtaAoutive, EvidenceAccordion, FaqAoutive, HeroAoutive, Plans, UseCases, WorkflowTabs } from "@/components/landing/aoutive";
 import { CheckSection, NumberStrip } from "@/components/landing/extras";
 import { landingData } from "@/lib/landing-data";
 
@@ -29,6 +29,7 @@ export default async function Landing() {
       <CheckSection example={d.example?.wallet ?? null} />
       <WorkflowTabs data={d} />
       <ChoiceTable />
+      <BeforeAfterSection data={d} />
       <UseCases />
       <Counters data={d} />
       <NumberStrip data={d} />
