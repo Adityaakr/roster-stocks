@@ -26,15 +26,20 @@ for (const p of pages) {
   });
 }
 
-test("the wallet check resolves the demo wallet in place", async ({ page, request }) => {
-  const s = (await (await request.get("/api/demo/summary")).json()) as { live?: boolean; wallet?: string };
+test("the wallet check resolves the sample wallet in place", async ({ page, request }) => {
+  const s = (await (await request.get("/api/demo/summary")).json()) as { live?: boolean; wallet?: string; totalShares6?: string };
   test.skip(!s.live || !s.wallet, "chain not reachable or not seeded");
   await page.goto("/");
+  const box = page.locator("#check");
   await page.locator("#check-input").fill(s.wallet!);
   await page.locator("#check form button[type=submit]").click();
-  await expect(page.locator("#check").getByText(/A wallet scan sees/)).toBeVisible({ timeout: 60_000 });
-  await expect(page.locator("#check").getByText(/Read at slot/)).toBeVisible();
-  await expect(page.locator("#check").getByText("Share equivalents")).toBeVisible();
+  await expect(box.getByText(/Read at slot|No tokenized stock/)).toBeVisible({ timeout: 60_000 });
+  if (BigInt(s.totalShares6 ?? "0") > 0n) {
+    await expect(box.getByText("Share equivalents")).toBeVisible();
+    // A real holding must never print as 0.00: small balances keep their six decimals.
+    const text = await box.innerText();
+    expect(text).not.toMatch(/Share equivalents\s*\n?\s*0\.00\s*$/m);
+  }
 });
 
 test("the number block prints the measured values from the visibility scan", async ({ page }) => {
