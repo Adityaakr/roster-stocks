@@ -300,9 +300,10 @@ select.field { appearance: none; padding-right: 28px; background-image: linear-g
 .pixel { position: relative; overflow: hidden; }
 .pixel .grid { position: absolute; inset: 0; display: grid; pointer-events: none; }
 .pixel .grid i { background: var(--line); display: block; }
-.axis { font-family: var(--mono); font-size: 11px; fill: var(--slate); letter-spacing: 0.04em; }
-.dotlabel { font-family: var(--sans); font-size: 13px; fill: var(--ink); }
-.dotsub { font-family: var(--mono); font-size: 11px; fill: var(--slate); }
+.axis { font-family: var(--mono); font-size: 10px; fill: var(--slate); letter-spacing: 0.06em; }
+.dotlabel { font-family: var(--display); font-size: 14px; fill: var(--ink); letter-spacing: -0.01em; }
+.dotsub { font-family: var(--sans); font-size: 11px; fill: var(--slate); }
+.quad-cap { font-family: var(--display); font-size: 12px; fill: var(--slate); letter-spacing: -0.01em; }
 
 /* App shell */
 .shell { display: grid; grid-template-columns: 240px minmax(0, 1fr); min-height: 100vh; }

@@ -3,44 +3,67 @@
 import { motion, useReducedMotion } from "motion/react";
 
 const DOTS = [
-  { id: "wrappers", x: 0.9, y: 0.18, name: "Third-party wrappers", sub: "xStocks, Ondo, Robinhood", anchor: "end" as const, dy: -1 },
-  { id: "issuer", x: 0.42, y: 0.66, name: "Issuer-sponsored shares", sub: "Superstate, Securitize, Figure", anchor: "start" as const, dy: 1 },
-  { id: "dtc", x: 0.1, y: 0.9, name: "DTC tokenized entitlements", sub: "DTC service, H2 2026", anchor: "start" as const, dy: 1 },
-  { id: "lookthrough", x: 0.9, y: 0.9, name: "Lookthrough", sub: "rights-bearing shares, anywhere a token can go", anchor: "end" as const, dy: -1 }
+  { id: "wrappers", x: 0.86, y: 0.16, name: "Third-party wrappers", sub: "xStocks, Ondo, Robinhood", side: "left" as const },
+  { id: "issuer", x: 0.3, y: 0.66, name: "Issuer-sponsored shares", sub: "Superstate, Securitize, Figure", side: "right" as const },
+  { id: "dtc", x: 0.1, y: 0.92, name: "DTC tokenized entitlements", sub: "DTC service, H2 2026", side: "right" as const },
+  { id: "lookthrough", x: 0.86, y: 0.78, name: "Lookthrough", sub: "rights-bearing shares, anywhere a token can go", side: "left" as const }
 ];
 
-/** The 2x2: composability across, rights up; three incumbents and Lookthrough in the top-right, drawn last. */
+/** The 2x2: composability across, rights up. Three incumbents each miss a quadrant; Lookthrough sits in the shaded one. */
 export function Quadrant() {
   const reduce = useReducedMotion();
   const W = 720;
-  const H = 420;
-  const pad = { l: 40, r: 24, t: 24, b: 56 };
+  const H = 470;
+  const pad = { l: 150, r: 28, t: 44, b: 70 };
   const px = (x: number) => pad.l + x * (W - pad.l - pad.r);
   const py = (y: number) => H - pad.b - y * (H - pad.t - pad.b);
   const lt = DOTS[3]!;
+  const midX = px(0.5);
+  const midY = py(0.5);
   const enter = (i: number) => (reduce ? {} : { initial: { opacity: 0, scale: 0.6 }, whileInView: { opacity: 1, scale: 1 }, viewport: { once: true, amount: 0.5 }, transition: { duration: 0.22, ease: [0.2, 0, 0, 1] as const, delay: 0.1 + i * 0.16 } });
+  const label = (d: (typeof DOTS)[number]) => {
+    const dir = d.side === "left" ? -1 : 1;
+    const x = px(d.x) + dir * 16;
+    return { x, anchor: d.side === "left" ? ("end" as const) : ("start" as const) };
+  };
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-labelledby="quad-title quad-desc" style={{ width: "100%", height: "auto", display: "block", maxWidth: 760 }}>
+    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-labelledby="quad-title quad-desc" style={{ width: "100%", height: "auto", display: "block" }}>
       <title id="quad-title">Rights against composability</title>
       <desc id="quad-desc">Third-party wrappers are composable with few rights. Issuer-sponsored shares and DTC entitlements carry rights but restrict where the token can go. Lookthrough sits in the top right: full rights, anywhere a token can go.</desc>
-      <line x1={pad.l} y1={py(0)} x2={W - pad.r} y2={py(0)} stroke="var(--line-strong)" strokeWidth="1" />
-      <line x1={pad.l} y1={py(0)} x2={pad.l} y2={pad.t} stroke="var(--line-strong)" strokeWidth="1" />
-      <text className="axis" x={pad.l} y={H - 34}>REGISTERED WALLETS ONLY</text>
-      <text className="axis" x={W - pad.r} y={H - 34} textAnchor="end">ANYWHERE A TOKEN CAN GO</text>
-      <text className="axis" x={(pad.l + W - pad.r) / 2} y={H - 12} textAnchor="middle">COMPOSABILITY</text>
-      <text className="axis" x={pad.l + 8} y={pad.t + 10}>FULL SHAREHOLDER RIGHTS</text>
-      <text className="axis" x={pad.l + 8} y={py(0) - 8}>PRICE EXPOSURE ONLY</text>
-      <text className="axis" transform={`translate(${pad.l - 20} ${(pad.t + py(0)) / 2}) rotate(-90)`} textAnchor="middle">RIGHTS</text>
+      {/* the quadrant Lookthrough fills */}
+      <rect x={midX} y={pad.t} width={W - pad.r - midX} height={midY - pad.t} fill="var(--surface)" />
+      {/* plot frame and midlines */}
+      <rect x={pad.l} y={pad.t} width={W - pad.l - pad.r} height={H - pad.t - pad.b} fill="none" stroke="var(--line)" strokeWidth="1" />
+      <line x1={midX} x2={midX} y1={pad.t} y2={H - pad.b} stroke="var(--line)" strokeWidth="1" strokeDasharray="2 4" />
+      <line x1={pad.l} x2={W - pad.r} y1={midY} y2={midY} stroke="var(--line)" strokeWidth="1" strokeDasharray="2 4" />
+      {/* quadrant captions */}
+      <text className="quad-cap" x={midX + 14} y={pad.t + 20}>Rights and composability</text>
+      <text className="quad-cap" x={pad.l + 14} y={midY - 12}>Rights, no DeFi</text>
+      <text className="quad-cap" x={midX + 14} y={H - pad.b - 12}>DeFi, no rights</text>
+      {/* axes */}
+      <text className="axis" x={pad.l} y={H - pad.b + 24}>REGISTERED WALLETS ONLY</text>
+      <text className="axis" x={W - pad.r} y={H - pad.b + 24} textAnchor="end">ANYWHERE A TOKEN CAN GO</text>
+      <text className="axis" x={(pad.l + W - pad.r) / 2} y={H - 14} textAnchor="middle">COMPOSABILITY →</text>
+      <text className="axis" x={pad.l - 14} y={pad.t + 14} textAnchor="end">FULL SHAREHOLDER</text>
+      <text className="axis" x={pad.l - 14} y={pad.t + 28} textAnchor="end">RIGHTS</text>
+      <text className="axis" x={pad.l - 14} y={H - pad.b - 4} textAnchor="end">PRICE EXPOSURE ONLY</text>
+      <text className="axis" transform={`translate(${pad.l - 14} ${(pad.t + py(0)) / 2}) rotate(-90)`} textAnchor="middle">RIGHTS ↑</text>
+      {/* the gap each incumbent leaves */}
       {DOTS.slice(0, 3).map((d, i) => (
-        <motion.line key={`gap-${d.id}`} x1={px(d.x)} y1={py(d.y)} x2={px(lt.x)} y2={py(lt.y)} stroke="var(--line-strong)" strokeWidth="1" strokeDasharray="3 5" {...(reduce ? {} : { initial: { pathLength: 0 }, whileInView: { pathLength: 1 }, viewport: { once: true, amount: 0.5 }, transition: { duration: 0.5, delay: 0.7 + i * 0.1 } })} />
+        <motion.line key={`gap-${d.id}`} x1={px(d.x)} y1={py(d.y)} x2={px(lt.x)} y2={py(lt.y)} stroke="var(--line-strong)" strokeWidth="1" strokeDasharray="3 5" {...(reduce ? {} : { initial: { opacity: 0 }, whileInView: { opacity: 1 }, viewport: { once: true, amount: 0.5 }, transition: { duration: 0.4, delay: 0.7 + i * 0.1 } })} />
       ))}
-      {DOTS.map((d, i) => (
-        <motion.g key={d.id} tabIndex={0} role="img" aria-label={`${d.name}: ${d.sub}`} style={{ outline: "none", transformOrigin: `${px(d.x)}px ${py(d.y)}px` }} {...enter(i)}>
-          <circle cx={px(d.x)} cy={py(d.y)} r={d.id === "lookthrough" ? 7 : 5} fill={d.id === "lookthrough" ? "var(--ink)" : "var(--paper)"} stroke="var(--ink)" strokeWidth="1.2" />
-          <text className="dotlabel" x={px(d.x) + (d.anchor === "end" ? -14 : 14)} y={py(d.y) + (d.dy < 0 ? -10 : 18)} textAnchor={d.anchor} fill={d.id === "lookthrough" ? "var(--accent)" : "var(--ink)"}>{d.name}</text>
-          <text className="dotsub" x={px(d.x) + (d.anchor === "end" ? -14 : 14)} y={py(d.y) + (d.dy < 0 ? 8 : 34)} textAnchor={d.anchor}>{d.sub}</text>
-        </motion.g>
-      ))}
+      {DOTS.map((d, i) => {
+        const l = label(d);
+        const us = d.id === "lookthrough";
+        return (
+          <motion.g key={d.id} tabIndex={0} role="img" aria-label={`${d.name}: ${d.sub}`} style={{ outline: "none", transformOrigin: `${px(d.x)}px ${py(d.y)}px` }} {...enter(i)}>
+            {us ? <circle cx={px(d.x)} cy={py(d.y)} r="12" fill="none" stroke="var(--ink)" strokeOpacity="0.18" strokeWidth="1" /> : null}
+            <circle cx={px(d.x)} cy={py(d.y)} r={us ? 6 : 5} fill={us ? "var(--ink)" : "var(--paper)"} stroke="var(--ink)" strokeWidth="1.2" />
+            <text className="dotlabel" x={l.x} y={py(d.y) - 4} textAnchor={l.anchor} fontWeight={us ? 600 : 500}>{d.name}</text>
+            <text className="dotsub" x={l.x} y={py(d.y) + 14} textAnchor={l.anchor}>{d.sub}</text>
+          </motion.g>
+        );
+      })}
     </svg>
   );
 }
