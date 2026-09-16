@@ -64,7 +64,7 @@ export const ResolveResponse = z
     assetId: z.string(),
     resolvedBy: z.string().optional(),
     mint: z.string().nullable().optional(),
-    asset: z.object({ assetId: z.string(), name: z.string(), symbol: z.string() }).loose().optional(),
+    asset: z.object({ assetId: z.string(), name: z.string(), symbol: z.string(), category: z.string().optional(), aliases: z.array(z.string()).optional() }).loose().optional(),
     variant: Variant.nullable().optional()
   })
   .loose();

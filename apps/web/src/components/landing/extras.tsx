@@ -17,7 +17,7 @@ export function CheckSection({ example }: { example: string | null }) {
       <Reveal y={48} delay={0.2}>
         <div className="crosshair" style={{ maxWidth: 640, margin: "48px auto 0", textAlign: "left" }} id="check">
           <i aria-hidden />
-          <div className="inner" style={{ padding: 0 }}><WalletCheck example={example} /></div>
+          <div className="inner" style={{ padding: 0, background: "#fff" }}><WalletCheck example={example} /></div>
         </div>
       </Reveal>
       </div>
