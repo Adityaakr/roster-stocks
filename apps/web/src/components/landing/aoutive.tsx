@@ -113,7 +113,7 @@ export function WorkflowTabs({ data }: { data: LandingData }) {
       <div className="two" style={{ display: "grid", gridTemplateColumns: "minmax(0, 586px) minmax(0, 512px)", justifyContent: "space-between", gap: 90, padding: "80px 30px", alignItems: "center" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 70 }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-            <ScrollColorText as="h2" text="One register, four steps." className="h-section" style={{ maxWidth: 526 }} />
+            <ScrollColorText as="h2" text="Four steps from pool to payout." className="h-section" style={{ maxWidth: 526 }} />
             <Reveal y={20} delay={0.1}><p className="body" style={{ margin: 0, maxWidth: 586 }}>Lookthrough runs every record date through one resolver. It reads program-owned accounts, attributes them under the issuer&apos;s rules, and settles claims and votes on-chain, so holders take part without leaving a pool.</p></Reveal>
           </div>
           <div className="wcards" role="tablist" aria-label="How it works">
