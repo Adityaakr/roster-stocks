@@ -49,3 +49,15 @@ export function sharesRounded(shares6: bigint | string, digits = 2): string {
   const frac = (rounded % 10n ** BigInt(digits)).toString().padStart(digits, "0");
   return `${whole.toLocaleString("en-US")}${digits ? `.${frac}` : ""}`;
 }
+
+/**
+ * Share equivalents at a precision that suits the size: two decimals from 0.01 up, otherwise every decimal the
+ * six-decimal share unit carries. A holding of 0.001293 shares must never print as 0.00.
+ */
+export function sharesSmart(shares6: bigint | string): string {
+  const v = BigInt(shares6);
+  const abs = v < 0n ? -v : v;
+  if (abs === 0n) return "0";
+  if (abs >= 10_000n) return sharesRounded(v, 2);
+  return shares(v, 6, 6);
+}

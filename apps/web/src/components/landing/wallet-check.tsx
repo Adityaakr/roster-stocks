@@ -6,7 +6,7 @@ import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
 import { LookthroughClient } from "@lookthrough/sdk";
 import { useDemoWallet } from "@/lib/demo-wallet";
 import { useCluster } from "@/lib/cluster";
-import { sharesRounded, short, slotLabel } from "@/lib/format";
+import { sharesSmart, short, slotLabel } from "@/lib/format";
 import { Roll, Stagger } from "@/components/motion";
 
 interface LedgerRow {
@@ -123,17 +123,21 @@ export function WalletCheck({ example, id = "check" }: { example: string | null;
                 ...rows.map((r, i) => (
                   <div key={`${r.source}-${i}`} className="mono" style={{ display: "flex", justifyContent: "space-between", gap: 12, fontSize: 13, lineHeight: "19px", padding: "8px 0", borderBottom: "1px solid var(--line)", color: "var(--ink-2)" }}>
                     <span>{LINE[r.source]}</span>
-                    <span className="num" style={{ color: "var(--ink)" }}>{sharesRounded(r.shares6, 2)}</span>
+                    <span className="num" style={{ color: "var(--ink)" }}>{sharesSmart(r.shares6)}</span>
                   </div>
                 )),
                 <div key="total" className="mono" style={{ display: "flex", justifyContent: "space-between", gap: 12, fontSize: 13, lineHeight: "19px", padding: "10px 0 0", borderTop: "1px solid var(--ink)", marginTop: -1, color: "var(--ink)" }}>
                   <span>Share equivalents</span>
-                  <span className="num">{sharesRounded(running[running.length - 1] ?? 0n, 2)}</span>
+                  <span className="num">{sharesSmart(running[running.length - 1] ?? 0n)}</span>
                 </div>
               ]}
             </Stagger>
             <p className="body" style={{ marginTop: 16 }}>
-              A wallet scan sees <span className="fig">{sharesRounded(visible, 2)}</span>. <span className="fig">{sharesRounded(hidden, 2)}</span> are invisible to the issuer.
+              {hidden > 0n ? (
+                <>A wallet scan sees <span className="fig">{sharesSmart(visible)}</span>. <span className="fig">{sharesSmart(hidden)}</span> are invisible to the issuer.</>
+              ) : (
+                <>All <span className="fig">{sharesSmart(total)}</span> of these shares sit in the wallet, so a record date can see them today. Move any of it into a pool or a vault and the issuer loses that part.</>
+              )}
             </p>
             <div className="btnrow" style={{ marginTop: 14 }}>
               {registered || data.registration.registered ? (
