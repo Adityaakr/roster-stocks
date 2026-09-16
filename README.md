@@ -107,6 +107,19 @@ pnpm --filter @lookthrough/web dev   # http://localhost:3000/?demo=1
 
 Registrar CLI: `pnpm registrar schedule|snapshot|register|publish|fund|claim|vote|proof|tally`. The web issuer console calls the same functions.
 
+### Try it on devnet with your own wallet
+
+The program is deployed on Solana devnet at `HVB7th73BLUF6kdHWcWkvNW3kGiVPHusfT97iQ5UnA4S`. A devnet profile runs the same app against a demo stock mint (Token-2022 with the scaled UI amount extension, multiplier 1.0032690125398187 like AAPLx) and a test USDC mint, so the registry, snapshot, root, claim and vote all run end to end with a browser wallet. Nothing on devnet is looked through: the Raydium pool and the Kamino reserve only exist on mainnet, so the resolver reports direct balances and says so in the snapshot warnings.
+
+```
+cp .env.devnet.example .env.devnet   # then set NEXT_PUBLIC_DEFAULT_MINT from .keys/devnet/demo.json after seeding
+cp <funded devnet keypair> .keys/devnet/registrar.json
+pnpm seed:devnet                     # demo stock mint, test USDC, Alice, Bob, Carol with SOL and shares
+pnpm dev:devnet                      # http://localhost:3001
+```
+
+In the app: connect a wallet set to devnet, use **Get demo shares** on the portfolio (mints 10 shares and tops up SOL for fees), **Register for corporate actions**, then run a record date from the issuer console. Your wallet is in the tree if it registered before the record slot; claim or vote from the portfolio with the proof verified in the browser. Public devnet RPCs refuse `getProgramAccounts`, so the devnet snapshot enumerates holders with `getTokenLargestAccounts` (complete up to 20 accounts) and records that in the warnings.
+
 Tests: `pnpm verify` runs typecheck, lint, unit tests (adapters on recorded mainnet fixtures, the invariant test, Merkle vectors) and the program's litesvm security suite. `pnpm test:e2e` runs the five scenes against the fork. A snapshot on the datasource-backed fork takes 5 to 15 minutes because every position holder lookup is proxied to a public RPC; a keyed RPC with generous `getProgramAccounts` shortens it.
 
 ## Who would use it

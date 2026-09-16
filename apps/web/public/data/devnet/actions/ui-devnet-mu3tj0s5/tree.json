@@ -1,0 +1,32 @@
+{
+  "root": "2fd7fe6f23ccff661c0e9d76f6a522c0c2a6c06bc0968f7efd60b3e52ce43f09",
+  "totalEntitlement": "175000000",
+  "leaves": [
+    {
+      "wallet": "ArzxCySUmJt5oMdBdqKtWJ7eWNSjabDSPLgMqrdT953s",
+      "entitlement": "100000000",
+      "leaf": "b47445f4dd4cda5b30211b18d1d6ba9b9153ddb606fc1d34a47b28a7a082bd23",
+      "proof": [
+        "ebf464e6526dbd90b6beb606b25218f7714a485bc2a44692af0214fe7378d6dc",
+        "db88bd2db0cf8dedc0ded5076eb81d41153f96bc47cd3723797380cc18e1f4f1"
+      ]
+    },
+    {
+      "wallet": "C85K9vCAyk4fmYQJLZi8bSTvuVXeJ96oPdgsAr8KYdUm",
+      "entitlement": "60000000",
+      "leaf": "ebf464e6526dbd90b6beb606b25218f7714a485bc2a44692af0214fe7378d6dc",
+      "proof": [
+        "b47445f4dd4cda5b30211b18d1d6ba9b9153ddb606fc1d34a47b28a7a082bd23",
+        "db88bd2db0cf8dedc0ded5076eb81d41153f96bc47cd3723797380cc18e1f4f1"
+      ]
+    },
+    {
+      "wallet": "GvKRes3US7gkomVM3hLKcip1Mu771dRijwCa5X94KCpW",
+      "entitlement": "15000000",
+      "leaf": "db88bd2db0cf8dedc0ded5076eb81d41153f96bc47cd3723797380cc18e1f4f1",
+      "proof": [
+        "72d0a955c81d7142ed56cb6884d82902403edea7778c3ccbfe9f9d62031618a1"
+      ]
+    }
+  ]
+}

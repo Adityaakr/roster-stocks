@@ -1,7 +1,8 @@
-!.env.example
 .anchor/
 .env
 .env.*
+!.env.example
+!.env.devnet.example
 .keys/
 .next/
 .prism/runs/

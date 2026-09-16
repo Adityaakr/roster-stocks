@@ -24,7 +24,10 @@
     "idl:sync": "bash scripts/idl-sync.sh",
     "anchor:build": "anchor build --arch v0 && bash scripts/idl-sync.sh",
     "anchor:deploy": "bash scripts/anchor-deploy.sh",
-    "smoke": "bash scripts/smoke.sh"
+    "smoke": "bash scripts/smoke.sh",
+    "seed:devnet": "LOOKTHROUGH_ENV=devnet tsx scripts/seed-devnet.ts",
+    "dev:devnet": "LOOKTHROUGH_ENV=devnet pnpm --filter @lookthrough/web exec next dev -p 3001",
+    "registrar:devnet": "LOOKTHROUGH_ENV=devnet tsx scripts/run-snapshot.ts"
   },
   "devDependencies": {
     "@anchor-lang/core": "1.2.0",

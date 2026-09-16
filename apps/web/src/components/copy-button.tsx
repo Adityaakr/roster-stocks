@@ -3,12 +3,12 @@
 import { useState } from "react";
 
 /** One-click copy that confirms in place. */
-export function CopyButton({ value, label = "Copy" }: { value: string; label?: string }) {
+export function CopyButton({ value, label = "copy" }: { value: string; label?: string }) {
   const [done, setDone] = useState(false);
   return (
     <button
       type="button"
-      className="chip"
+      className="tag"
       aria-label={`${label} ${value}`}
       onClick={async () => {
         try {
@@ -20,7 +20,7 @@ export function CopyButton({ value, label = "Copy" }: { value: string; label?: s
         }
       }}
     >
-      {done ? "Copied" : label}
+      {done ? "copied" : label}
     </button>
   );
 }
@@ -28,7 +28,7 @@ export function CopyButton({ value, label = "Copy" }: { value: string; label?: s
 export function Hash({ value, n = 6 }: { value: string; n?: number }) {
   return (
     <span className="inline-flex items-center gap-2">
-      <span className="num" title={value}>
+      <span className="mono" title={value}>
         {value.length > n * 2 + 1 ? `${value.slice(0, n)}…${value.slice(-n)}` : value}
       </span>
       <CopyButton value={value} />

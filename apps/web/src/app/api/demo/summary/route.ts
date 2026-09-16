@@ -4,7 +4,7 @@ import { LookthroughClient } from "@lookthrough/sdk";
 import { proofFor } from "@lookthrough/registrar";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { connection, forkReachable, json, reader, repoRoot, store } from "@/lib/server";
+import { connection, forkReachable, json, reader, store, keysDir } from "@/lib/server";
 
 export const dynamic = "force-dynamic";
 
@@ -13,8 +13,8 @@ export const dynamic = "force-dynamic";
  * distribution and vote. Falls back to the last demo run's action records when the fork is down, and says so.
  */
 export async function GET() {
-  const demoPath = path.join(repoRoot(), ".keys/demo.json");
-  const alicePath = path.join(repoRoot(), ".keys/alice.json");
+  const demoPath = path.join(keysDir(), "demo.json");
+  const alicePath = path.join(keysDir(), "alice.json");
   if (!existsSync(demoPath) || !existsSync(alicePath)) return json({ live: false, reason: "not seeded" });
   const demo = JSON.parse(readFileSync(demoPath, "utf8")) as { mint: string };
   const alice = Keypair.fromSecretKey(new Uint8Array(JSON.parse(readFileSync(alicePath, "utf8")))).publicKey;

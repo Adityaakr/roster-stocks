@@ -14,6 +14,8 @@ export interface HttpClientOptions {
   headers?: Record<string, string>;
   cacheTtlMs?: number;
   maxRetries?: number;
+  /** Per-attempt timeout; a stalled upstream is retried like a 5xx instead of hanging the caller. Default 15 s. */
+  timeoutMs?: number;
   fetchImpl?: typeof fetch;
   logger?: (message: string) => void;
 }
@@ -47,6 +49,7 @@ export class HttpClient {
       headers: opts.headers ?? {},
       cacheTtlMs: opts.cacheTtlMs ?? 60_000,
       maxRetries: opts.maxRetries ?? 4,
+      timeoutMs: opts.timeoutMs ?? 15_000,
       fetchImpl: opts.fetchImpl ?? fetch,
       logger: opts.logger ?? (() => undefined)
     };
@@ -84,10 +87,23 @@ export class HttpClient {
   private async request<T>(url: string, init: RequestInit): Promise<T> {
     let attempt = 0;
     for (;;) {
-      const res = await this.opts.fetchImpl(url, {
-        ...init,
-        headers: { ...this.opts.headers, ...(init.headers as Record<string, string> | undefined) }
-      });
+      let res: Response;
+      try {
+        res = await this.opts.fetchImpl(url, {
+          ...init,
+          headers: { ...this.opts.headers, ...(init.headers as Record<string, string> | undefined) },
+          signal: AbortSignal.timeout(this.opts.timeoutMs)
+        });
+      } catch (err) {
+        if (attempt < this.opts.maxRetries) {
+          const backoff = Math.min(8_000, 250 * 2 ** attempt);
+          this.opts.logger(`${init.method} ${url} -> ${err instanceof Error ? err.name : "error"}, retrying in ${backoff}ms`);
+          attempt += 1;
+          await sleep(backoff);
+          continue;
+        }
+        throw err;
+      }
       const requestId = res.headers.get("x-request-id") ?? undefined;
       const text = await res.text();
       let body: unknown = text;

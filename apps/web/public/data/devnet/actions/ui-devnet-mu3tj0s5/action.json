@@ -1,0 +1,33 @@
+{
+  "id": "ui-devnet-mu3tj0s5",
+  "actionIdHex": "026ad36d55f6274a354c943f4a1c9cd35a75b24f1568f06fa3afd527c0b27d62",
+  "kind": "vote",
+  "mint": "9DMJk1u4XWU9BwxuXpunywYcPPnS8FMobwyjJXgNoPYW",
+  "symbol": "LTAAPL",
+  "title": "LTAAPL shareholder vote",
+  "createdAt": "2026-09-16T08:07:55.808Z",
+  "recordSlot": 499196873,
+  "recordSlotScheduledAt": "2026-09-16T08:07:55.808Z",
+  "question": "Approve acquisition of XYZ",
+  "deadlineSlot": 499201373,
+  "registryOverride": [
+    "ArzxCySUmJt5oMdBdqKtWJ7eWNSjabDSPLgMqrdT953s",
+    "C85K9vCAyk4fmYQJLZi8bSTvuVXeJ96oPdgsAr8KYdUm",
+    "GvKRes3US7gkomVM3hLKcip1Mu771dRijwCa5X94KCpW"
+  ],
+  "status": "open",
+  "snapshot": {
+    "slotActual": 499196884,
+    "timestamp": 1789546081,
+    "root": "2fd7fe6f23ccff661c0e9d76f6a522c0c2a6c06bc0968f7efd60b3e52ce43f09",
+    "contentHash": "8d0de092a788a40aa23bc205a74ec782b34128b0e4191e1efa4f708d1f777b4a",
+    "totalEntitlement": "175000000",
+    "leaves": 3,
+    "attributedPct": "100.00"
+  },
+  "onchain": {
+    "actionPda": "6rzocDAbif827q7yqymfk1j44TcQaDXC6aJ7PVCFSNU3",
+    "createTx": "5gEH4qVgmHtf7BTc7qRipij61r9HLXQzxN3QZwWYZFCpXkgZNukuJjVq4aoxE9ZsBAkNSR5nZndEhDPrUYHKrVY9",
+    "vault": "BE53b5Jyj8JVuvxM51wBWjYu5Yp7zJe5cESfiD8rEb38"
+  }
+}

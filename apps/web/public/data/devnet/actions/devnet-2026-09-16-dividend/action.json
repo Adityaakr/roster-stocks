@@ -1,0 +1,32 @@
+{
+  "id": "devnet-2026-09-16-dividend",
+  "actionIdHex": "4594cc1f7bf10a1bcb9663b2c2fbbe6a6ec0459bffed6876fae50c69a26b81c6",
+  "kind": "distribution",
+  "mint": "9DMJk1u4XWU9BwxuXpunywYcPPnS8FMobwyjJXgNoPYW",
+  "symbol": "LTAAPL",
+  "title": "LTAAPL cash distribution",
+  "createdAt": "2026-09-16T07:35:19.678Z",
+  "recordSlot": 499185107,
+  "recordSlotScheduledAt": "2026-09-16T07:35:19.678Z",
+  "amountPerShareMicro": "250000",
+  "registryOverride": [
+    "ArzxCySUmJt5oMdBdqKtWJ7eWNSjabDSPLgMqrdT953s",
+    "C85K9vCAyk4fmYQJLZi8bSTvuVXeJ96oPdgsAr8KYdUm",
+    "GvKRes3US7gkomVM3hLKcip1Mu771dRijwCa5X94KCpW"
+  ],
+  "status": "funded",
+  "snapshot": {
+    "slotActual": 499186433,
+    "timestamp": 1789544345,
+    "root": "82fc1cad3096b2842663bfa4efc2d0a4f1244b2a567baf33c2e3dcdc4e4249dd",
+    "contentHash": "cb79c5d9a77e0c4f34c3ac11df5592a6169886cc319aaa935f8dc035df71c7d9",
+    "totalEntitlement": "175000000",
+    "leaves": 3,
+    "attributedPct": "100.00"
+  },
+  "onchain": {
+    "actionPda": "BZN9fTFsa7iMZ3xEcWd5C7CxKpZ87DUrx6nzamdxmVyo",
+    "createTx": "3zW7xpJc7Wnqo91T4o7hBFDzMsPzjKf5XKJ7K8fg1fTUieqij3gHe8VXHSwJRuZ2ZbdUsAhHHgkgF6BgHhoFrizQ",
+    "vault": "9r3TFgNU91a6YrsaXd8UwyqxfuNtW2paCA8srTbb6NzQ"
+  }
+}

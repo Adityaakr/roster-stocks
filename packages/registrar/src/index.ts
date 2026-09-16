@@ -244,6 +244,15 @@ export async function publish(store: ActionStore, id: string, log: Log, opts?: {
   const existing = await client.fetchAction(actionId);
   if (existing) {
     log(`action ${id} already published at ${existing.address.toBase58()}`);
+    if (!action.onchain) {
+      // The create transaction landed but its confirmation timed out before the record was saved: recover the signature.
+      const sigs = await client.provider.connection.getSignaturesForAddress(existing.address, { limit: 20 });
+      const createTx = sigs[sigs.length - 1]?.signature ?? "unknown";
+      action.status = action.kind === "vote" ? "open" : existing.funded ? "funded" : "published";
+      action.onchain = { actionPda: existing.address.toBase58(), createTx, vault: existing.vault.toBase58() };
+      store.save(action);
+      log(`recorded on-chain state for ${id} (create tx ${createTx})`);
+    }
     return action;
   }
   const usdcMint = new PublicKey(demoInfo().usdcMint);
@@ -277,6 +286,10 @@ export async function fund(store: ActionStore, id: string, usdc: number, log: Lo
   if (!before) throw new Error(`${id} is not published`);
   if (before.funded) {
     log(`action ${id} is already funded; claims are open`);
+    if (action.status !== "funded") {
+      action.status = "funded";
+      store.save(action);
+    }
     return action;
   }
   const micro = BigInt(Math.round(usdc * 1_000_000));

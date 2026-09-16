@@ -27,6 +27,8 @@ export const Variant = z
     kind: z.string().optional(),
     stockVariantTier: StockVariantTier.optional(),
     liquidityTier: z.string().optional(),
+    trustTier: z.string().optional(),
+    tags: z.array(z.string()).optional(),
     symbol: z.string().optional(),
     name: z.string().optional(),
     decimals: z.number().optional(),
@@ -99,6 +101,62 @@ export const Candle = z
   .loose();
 export type Candle = z.infer<typeof Candle>;
 
+export const CuratedAsset = z
+  .object({
+    assetId: z.string(),
+    name: z.string(),
+    symbol: z.string(),
+    category: z.string().optional(),
+    imageUrl: z.string().nullable().optional(),
+    stats: z
+      .object({
+        price: z.number().nullable().optional(),
+        liquidity: z.number().nullable().optional(),
+        volume24hUSD: z.number().nullable().optional(),
+        marketCap: z.number().nullable().optional(),
+        fdv: z.number().nullable().optional(),
+        priceChange24hPercent: z.number().nullable().optional(),
+        priceChange1hPercent: z.number().nullable().optional(),
+        volume30dUSD: z.number().nullable().optional(),
+        totalSupply: z.number().nullable().optional(),
+        circulatingSupply: z.number().nullable().optional()
+      })
+      .loose()
+      .nullable()
+      .optional(),
+    advisories: z.array(z.unknown()).optional(),
+    primaryVariant: Variant.nullable().optional(),
+    variants: z.array(Variant).optional()
+  })
+  .loose();
+export type CuratedAsset = z.infer<typeof CuratedAsset>;
+
+export const AssetDetail = z
+  .object({
+    assetId: z.string(),
+    name: z.string(),
+    symbol: z.string(),
+    description: z.string().nullable().optional(),
+    category: z.string().optional(),
+    aliases: z.array(z.string()).optional(),
+    symbols: z.array(z.string()).optional(),
+    imageUrl: z.string().nullable().optional(),
+    stats: CuratedAsset.shape.stats,
+    canonicalMarket: z.object({ source: z.string().optional(), symbol: z.string().optional(), price: z.number().nullable().optional(), marketCap: z.number().nullable().optional(), priceChange24hPercent: z.number().nullable().optional() }).loose().nullable().optional()
+  })
+  .loose();
+export type AssetDetail = z.infer<typeof AssetDetail>;
+const AssetDetailResponse = z.object({ asset: AssetDetail }).loose();
+
+export const CuratedPage = z
+  .object({
+    listId: z.string().optional(),
+    pagination: z.object({ offset: z.number(), limit: z.number(), total: z.number(), hasMore: z.boolean(), nextOffset: z.number().nullable().optional() }).loose(),
+    assets: z.array(CuratedAsset)
+  })
+  .loose();
+export type CuratedPage = z.infer<typeof CuratedPage>;
+
 function unwrapList<T>(raw: unknown, schema: z.ZodType<T>, keys: string[]): T[] {
   if (Array.isArray(raw)) return z.array(schema).parse(raw);
   if (typeof raw === "object" && raw !== null) {
@@ -136,6 +194,12 @@ export class TokensClient {
     return ResolveResponse.parse(await this.http.get<unknown>("/assets/resolve", { mint }));
   }
 
+  /** GET /assets/:assetId (live 2026-09-16: `{ asset: { assetId, name, symbol, description, category, aliases, symbols, imageUrl, stats, canonicalMarket } }`) */
+  async asset(assetId: string): Promise<AssetDetail> {
+    const raw = await this.http.get<unknown>(`/assets/${encodeURIComponent(assetId)}`);
+    return AssetDetailResponse.parse(raw).asset;
+  }
+
   /** GET /assets/:assetId/variants?kind=… */
   async variants(assetId: string, opts?: { kind?: string; stockVariantTier?: StockVariantTier }): Promise<Variant[]> {
     const raw = await this.http.get<unknown>(`/assets/${encodeURIComponent(assetId)}/variants`, {
@@ -152,12 +216,23 @@ export class TokensClient {
   }
 
   /** GET /assets/:assetId/price-chart?mint=…&interval=1H (omit mint for the canonical underlying series) */
-  async priceChart(assetId: string, opts?: { mint?: string; interval?: "1m" | "5m" | "15m" | "1H" | "4H" | "1D" | "1W" }): Promise<Candle[]> {
+  async priceChart(assetId: string, opts?: { mint?: string; interval?: "1m" | "5m" | "15m" | "1H" | "4H" | "1D" | "1W"; from?: number; to?: number }): Promise<Candle[]> {
     const raw = await this.http.get<unknown>(`/assets/${encodeURIComponent(assetId)}/price-chart`, {
       mint: opts?.mint,
-      interval: opts?.interval ?? "1H"
+      interval: opts?.interval ?? "1H",
+      from: opts?.from,
+      to: opts?.to
     });
     return unwrapList(raw, Candle, ["candles", "data", "results", "items", "ohlcv"]);
+  }
+
+  /**
+   * GET /assets/curated?list=stocks|etfs&groupBy=asset&variants=all&limit=&offset=
+   * Live shape observed on 2026-09-16: `variants=all` (not `variantsMode`) adds every wrapper per asset.
+   */
+  async curated(list: "stocks" | "etfs", opts?: { limit?: number; offset?: number }): Promise<CuratedPage> {
+    const raw = await this.http.get<unknown>("/assets/curated", { list, groupBy: "asset", variants: "all", limit: opts?.limit ?? 50, offset: opts?.offset ?? 0 });
+    return CuratedPage.parse(raw);
   }
 
   /** POST /assets/market-snapshots { mints } */

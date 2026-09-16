@@ -90,6 +90,16 @@ export class RpcReader implements ChainReader {
     return res.value.map(({ pubkey, account }) => toRaw(pubkey.toBase58(), account) as RawAccount);
   }
 
+  async getTokenLargestAccounts(mint: Base58): Promise<{ address: Base58; amountRaw: bigint }[] | null> {
+    try {
+      const res = await withRetry(() => this.connection.getTokenLargestAccounts(new PublicKey(mint), this.commitment), "getTokenLargestAccounts", this.log, 4);
+      return res.value.map((v) => ({ address: v.address.toBase58(), amountRaw: BigInt(v.amount) }));
+    } catch (err) {
+      this.log(`getTokenLargestAccounts failed: ${err instanceof Error ? err.message.slice(0, 80) : err}`);
+      return null;
+    }
+  }
+
   async getProgramAccounts(programId: Base58, filters: AccountFilter[], dataSlice?: { offset: number; length: number }): Promise<RawAccount[]> {
     const run = async (conn: Connection) => {
       const res = await conn.getProgramAccounts(new PublicKey(programId), {

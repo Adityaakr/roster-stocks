@@ -8,7 +8,7 @@ import BN from "bn.js";
 import { CLMM_PROGRAM_ID, LiquidityMathUtil, PersonalPositionLayout, PoolInfoLayout, TickUtil, getPdaPersonalPositionAddress } from "@raydium-io/raydium-sdk-v2";
 import { Obligation, PROGRAM_ID as KLEND_PROGRAM_ID_ADDR, Reserve, VanillaObligation } from "@kamino-finance/klend-sdk";
 import { address } from "@solana/kit";
-import { KAMINO_LEND_PROGRAM, RAYDIUM_CLMM_PROGRAM, TOKEN_2022_PROGRAM, TOKEN_PROGRAM, rawToShares6, type Base58, type ChainReader, type MintInfo } from "@lookthrough/core";
+import { isGpaRefused, KAMINO_LEND_PROGRAM, RAYDIUM_CLMM_PROGRAM, TOKEN_2022_PROGRAM, TOKEN_PROGRAM, rawToShares6, type Base58, type ChainReader, type MintInfo } from "@lookthrough/core";
 import { KaminoLendAdapter, OBLIGATION_SIZE, POOL_STATE_SPAN, RESERVE_OFFSETS, RESERVE_SPAN, RaydiumClmmAdapter } from "@lookthrough/adapters";
 import { readMintInfo } from "@lookthrough/datasources";
 
@@ -41,7 +41,13 @@ const reserveCache = new Map<string, { keys: string[]; at: number }>();
 async function reservesForMint(reader: ChainReader, mint: Base58): Promise<string[]> {
   const hit = reserveCache.get(mint);
   if (hit && Date.now() - hit.at < 10 * 60_000) return hit.keys;
-  const keys = (await reader.getProgramAccounts(KAMINO_LEND_PROGRAM, [{ dataSize: RESERVE_SPAN }, { memcmp: { offset: RESERVE_OFFSETS.liquidityMint, bytes: mint } }], { offset: 0, length: 0 })).map((r) => r.pubkey);
+  let keys: string[] = [];
+  try {
+    keys = (await reader.getProgramAccounts(KAMINO_LEND_PROGRAM, [{ dataSize: RESERVE_SPAN }, { memcmp: { offset: RESERVE_OFFSETS.liquidityMint, bytes: mint } }], { offset: 0, length: 0 })).map((r) => r.pubkey);
+  } catch (err) {
+    // RPCs that refuse getProgramAccounts (devnet tiers) cannot discover reserves; the wallet ledger then shows direct balances and Raydium positions only.
+    if (!isGpaRefused(err)) throw err;
+  }
   reserveCache.set(mint, { keys, at: Date.now() });
   return keys;
 }

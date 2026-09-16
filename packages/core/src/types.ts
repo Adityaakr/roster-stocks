@@ -63,6 +63,11 @@ export interface ChainReader {
   getProgramAccounts(programId: Base58, filters: AccountFilter[], dataSlice?: { offset: number; length: number }): Promise<RawAccount[]>;
   /** Token accounts owned by `owner` under one token program (the indexed RPC path; cheap, and the fork merges local writes). */
   getTokenAccountsByOwner(owner: Base58, tokenProgram: Base58): Promise<RawAccount[]>;
+  /**
+   * Optional: the 20 largest token accounts of a mint (the `getTokenLargestAccounts` RPC). Used only when the RPC
+   * refuses getProgramAccounts on the token program (public devnet, keyed free tiers). Returns null when unsupported.
+   */
+  getTokenLargestAccounts?(mint: Base58): Promise<{ address: Base58; amountRaw: bigint }[] | null>;
 }
 
 export interface MultiplierInfo {

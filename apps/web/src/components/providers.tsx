@@ -10,6 +10,7 @@ if (typeof window !== "undefined" && !(window as unknown as { Buffer?: unknown }
 import { ConnectionProvider, WalletProvider } from "@solana/wallet-adapter-react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import { DemoWalletProvider } from "@/lib/demo-wallet";
+import { ClusterProvider } from "@/lib/cluster";
 
 /** Wallet adapter wiring. The RPC endpoint is the fork; wallets are auto-discovered (Wallet Standard). */
 export function Providers({ children }: { children: ReactNode }) {
@@ -18,7 +19,9 @@ export function Providers({ children }: { children: ReactNode }) {
     <ConnectionProvider endpoint={endpoint} config={{ commitment: "confirmed" }}>
       <WalletProvider wallets={[]} autoConnect>
         <WalletModalProvider>
-          <DemoWalletProvider>{children}</DemoWalletProvider>
+          <ClusterProvider>
+            <DemoWalletProvider>{children}</DemoWalletProvider>
+          </ClusterProvider>
         </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>

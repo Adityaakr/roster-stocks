@@ -1,0 +1,125 @@
+{
+  "actionId": "026ad36d55f6274a354c943f4a1c9cd35a75b24f1568f06fa3afd527c0b27d62",
+  "mint": "9DMJk1u4XWU9BwxuXpunywYcPPnS8FMobwyjJXgNoPYW",
+  "snapshotSlotRequested": 499196873,
+  "snapshotSlotActual": 499196884,
+  "snapshotTimestamp": 1789546081,
+  "multiplier": "1.0032690125398187",
+  "multiplierSource": "scaled_ui_amount.new_multiplier",
+  "decimals": 8,
+  "supplyRaw": "17442978685",
+  "accountsScanned": 3,
+  "attributedRaw": "17442978685",
+  "unattributedRaw": "0",
+  "unattributed": [],
+  "adaptersUsed": [
+    {
+      "id": "direct",
+      "status": "implemented",
+      "containers": 0
+    },
+    {
+      "id": "raydium_clmm",
+      "status": "implemented",
+      "containers": 0
+    },
+    {
+      "id": "kamino_lend",
+      "status": "implemented",
+      "containers": 0
+    },
+    {
+      "id": "meteora_dlmm",
+      "status": "stub",
+      "containers": 0
+    },
+    {
+      "id": "orca_whirlpool",
+      "status": "stub",
+      "containers": 0
+    },
+    {
+      "id": "baskets",
+      "status": "stub",
+      "containers": 0
+    },
+    {
+      "id": "backpack_omnibus",
+      "status": "stub",
+      "containers": 0
+    }
+  ],
+  "invariants": {
+    "ok": true,
+    "failures": [],
+    "warnings": [
+      "container discovery unavailable on this RPC for raydium_clmm, kamino_lend (getProgramAccounts refused)",
+      "token accounts enumerated with getTokenLargestAccounts (this RPC refuses getProgramAccounts); the 20-account limit was not reached, so the scan is complete"
+    ]
+  },
+  "entries": [
+    {
+      "wallet": "ArzxCySUmJt5oMdBdqKtWJ7eWNSjabDSPLgMqrdT953s",
+      "entitlement": "100000000",
+      "rawTotal": "9967416391",
+      "registered": true,
+      "breakdown": [
+        {
+          "wallet": "ArzxCySUmJt5oMdBdqKtWJ7eWNSjabDSPLgMqrdT953s",
+          "mint": "9DMJk1u4XWU9BwxuXpunywYcPPnS8FMobwyjJXgNoPYW",
+          "source": "direct",
+          "container": "GvFjTGzyKfbKdGdSfg91suCGHuPQcnjWduND2QKhUsYX",
+          "rawAttributed": "9967416391",
+          "ruleApplied": "direct",
+          "evidence": {
+            "tokenAccount": "GvFjTGzyKfbKdGdSfg91suCGHuPQcnjWduND2QKhUsYX",
+            "owner": "ArzxCySUmJt5oMdBdqKtWJ7eWNSjabDSPLgMqrdT953s",
+            "amountRaw": "9967416391"
+          }
+        }
+      ]
+    },
+    {
+      "wallet": "C85K9vCAyk4fmYQJLZi8bSTvuVXeJ96oPdgsAr8KYdUm",
+      "entitlement": "60000000",
+      "rawTotal": "5980449835",
+      "registered": true,
+      "breakdown": [
+        {
+          "wallet": "C85K9vCAyk4fmYQJLZi8bSTvuVXeJ96oPdgsAr8KYdUm",
+          "mint": "9DMJk1u4XWU9BwxuXpunywYcPPnS8FMobwyjJXgNoPYW",
+          "source": "direct",
+          "container": "FaZy4KakRH7Ruf6ces64J3ne7XDziRhnTwH2UXsszFb1",
+          "rawAttributed": "5980449835",
+          "ruleApplied": "direct",
+          "evidence": {
+            "tokenAccount": "FaZy4KakRH7Ruf6ces64J3ne7XDziRhnTwH2UXsszFb1",
+            "owner": "C85K9vCAyk4fmYQJLZi8bSTvuVXeJ96oPdgsAr8KYdUm",
+            "amountRaw": "5980449835"
+          }
+        }
+      ]
+    },
+    {
+      "wallet": "GvKRes3US7gkomVM3hLKcip1Mu771dRijwCa5X94KCpW",
+      "entitlement": "15000000",
+      "rawTotal": "1495112459",
+      "registered": true,
+      "breakdown": [
+        {
+          "wallet": "GvKRes3US7gkomVM3hLKcip1Mu771dRijwCa5X94KCpW",
+          "mint": "9DMJk1u4XWU9BwxuXpunywYcPPnS8FMobwyjJXgNoPYW",
+          "source": "direct",
+          "container": "E1YGqHWzzuqkUbrJ9nAiT8MZUsWt9DN3oPe27Nt1EK5Q",
+          "rawAttributed": "1495112459",
+          "ruleApplied": "direct",
+          "evidence": {
+            "tokenAccount": "E1YGqHWzzuqkUbrJ9nAiT8MZUsWt9DN3oPe27Nt1EK5Q",
+            "owner": "GvKRes3US7gkomVM3hLKcip1Mu771dRijwCa5X94KCpW",
+            "amountRaw": "1495112459"
+          }
+        }
+      ]
+    }
+  ]
+}

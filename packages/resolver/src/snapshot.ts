@@ -2,12 +2,12 @@
  * Snapshot orchestration: read the mint, discover containers, enumerate and classify token accounts,
  * resolve through adapters, build the entitlement set, check invariants.
  */
-import { formatShares6, percent2, rawToShares6, type Base58, type ContainerInfo, type EntitlementPosition, type Logger, type MintInfo, type PassThroughRules, type PositionAdapter, type SnapshotContext, type UnattributedRow } from "@lookthrough/core";
+import { formatShares6, isGpaRefused, percent2, rawToShares6, type Base58, type ContainerInfo, type EntitlementPosition, type Logger, type MintInfo, type PassThroughRules, type PositionAdapter, type SnapshotContext, type UnattributedRow } from "@lookthrough/core";
 import { readMintInfo } from "@lookthrough/datasources";
 import type { ChainReader } from "@lookthrough/core";
 import { classifyAccounts } from "./classify";
 import { checkInvariants, type InvariantResult } from "./invariants";
-import { enumerateTokenAccounts } from "./scan";
+import { scanTokenAccounts } from "./scan";
 
 export interface SnapshotOptions {
   reader: ChainReader;
@@ -93,16 +93,27 @@ export async function runSnapshot(opts: SnapshotOptions): Promise<EntitlementSet
   // 1. Discover containers from program state.
   const containers: ContainerInfo[] = [];
   const adaptersUsed: EntitlementSet["adaptersUsed"] = [];
+  const discoveryUnavailable: string[] = [];
   for (const adapter of opts.adapters) {
-    const found = await adapter.discoverContainers(opts.mint, ctx);
+    let found: ContainerInfo[] = [];
+    try {
+      found = await adapter.discoverContainers(opts.mint, ctx);
+    } catch (err) {
+      // An RPC that refuses getProgramAccounts cannot discover anything; say so instead of failing, and anything the
+      // adapter would have covered stays in the unattributed bucket with its program label.
+      if (!isGpaRefused(err)) throw err;
+      log.warn(`${adapter.id}: container discovery unavailable on this RPC (getProgramAccounts refused); its holdings, if any, stay unattributed`);
+      discoveryUnavailable.push(adapter.id);
+    }
     containers.push(...found);
     adaptersUsed.push({ id: adapter.id, status: adapter.status, containers: found.length });
   }
   progress("containers", { count: containers.length });
 
   // 2. Enumerate and classify every token account for the mint.
-  const rows = await enumerateTokenAccounts(reader, mintInfo);
-  progress("accounts", { count: rows.length });
+  const scan = await scanTokenAccounts(reader, mintInfo, (m) => log.warn(m));
+  const rows = scan.rows;
+  progress("accounts", { count: rows.length, method: scan.method, complete: scan.complete });
   const classified = await classifyAccounts(reader, rows, containers);
   progress("classified", { wallets: classified.wallet.length, containers: classified.container.length, programHeld: classified.programHeld.length });
 
@@ -158,6 +169,8 @@ export async function runSnapshot(opts: SnapshotOptions): Promise<EntitlementSet
   // 5. Invariants.
   const balances = new Map(rows.map((r) => [r.pubkey, r.amountRaw]));
   const invariants = checkInvariants({ positions, unattributed, balances, supplyRaw: mintInfo.supplyRaw });
+  if (discoveryUnavailable.length) invariants.warnings.push(`container discovery unavailable on this RPC for ${discoveryUnavailable.join(", ")} (getProgramAccounts refused)`);
+  if (scan.method === "largest_accounts") invariants.warnings.push(`token accounts enumerated with getTokenLargestAccounts (this RPC refuses getProgramAccounts); ${scan.complete ? "the 20-account limit was not reached, so the scan is complete" : "the mint has more than 20 accounts and the scan is incomplete"}`);
   for (const w of invariants.warnings) log.warn(w);
   if (!invariants.ok) {
     for (const f of invariants.failures) log.warn(`INVARIANT FAILED: ${f}`);

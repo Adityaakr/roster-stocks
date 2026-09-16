@@ -9,8 +9,9 @@
  *   vote     --action <id> --keypair <path> --choice for|against|abstain
  *   proof    --action <id> --wallet <pubkey>
  *   tally    --action <id>
- * Environment: FORK_RPC_URL (default http://127.0.0.1:8899), REGISTRAR_KEYPAIR_PATH (default .keys/registrar.json).
+ * Environment: FORK_RPC_URL (default http://127.0.0.1:8899), REGISTRAR_KEYPAIR_PATH (default .keys/registrar.json), LOOKTHROUGH_ENV=devnet loads .env.devnet on top of .env.
  */
+import "./env-load";
 import { existsSync, readFileSync } from "node:fs";
 import { PublicKey } from "@solana/web3.js";
 import { ActionStore } from "@lookthrough/resolver";
@@ -29,13 +30,13 @@ function need(name: string): string {
 const log = (m: string, data?: unknown) => console.log(data === undefined ? m : `${m} ${JSON.stringify(data)}`);
 
 function seedRegistry(): string[] {
-  const p = ".keys/registry.json";
+  const p = `${process.env.LOOKTHROUGH_KEYS_DIR ?? ".keys"}/registry.json`;
   return existsSync(p) ? (JSON.parse(readFileSync(p, "utf8")) as string[]) : [];
 }
 
 async function main() {
   const cmd = process.argv[2];
-  const store = new ActionStore(arg("dir", undefined));
+  const store = new ActionStore(arg("dir", process.env.LOOKTHROUGH_DATA_DIR ? `${process.env.LOOKTHROUGH_DATA_DIR}/actions` : undefined));
   switch (cmd) {
     case "schedule": {
       await recordDateSuggestion(log);

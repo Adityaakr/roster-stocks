@@ -21,20 +21,34 @@ export function repoRoot(): string {
 }
 
 const root = repoRoot();
-process.env.LOOKTHROUGH_KEYS_DIR ??= path.join(root, ".keys");
-if (!process.env.REGISTRAR_KEYPAIR_PATH && existsSync(path.join(root, ".keys/registrar.json"))) process.env.REGISTRAR_KEYPAIR_PATH = path.join(root, ".keys/registrar.json");
-// load the repo .env for route handlers started from apps/web
-try {
-  const env = readFileSync(path.join(root, ".env"), "utf8");
-  for (const line of env.split("\n")) {
-    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
-    if (m && m[1] && process.env[m[1]] === undefined) process.env[m[1]] = m[2] ?? "";
+// load the repo .env (and .env.<LOOKTHROUGH_ENV> on top) for route handlers started from apps/web
+const fromFiles: Record<string, string> = {};
+for (const f of [".env", ...(process.env.LOOKTHROUGH_ENV ? [`.env.${process.env.LOOKTHROUGH_ENV}`] : [])]) {
+  try {
+    for (const line of readFileSync(path.join(root, f), "utf8").split("\n")) {
+      const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/);
+      if (m && m[1]) fromFiles[m[1]] = m[2] ?? "";
+    }
+  } catch {
+    // no file, fine
   }
-} catch {
-  // no .env, fine
+}
+for (const [k, v] of Object.entries(fromFiles)) if (process.env[k] === undefined) process.env[k] = v;
+// Key paths are relative to the repo root, not to apps/web.
+process.env.LOOKTHROUGH_KEYS_DIR = path.resolve(root, process.env.LOOKTHROUGH_KEYS_DIR ?? ".keys");
+process.env.REGISTRAR_KEYPAIR_PATH = path.resolve(root, process.env.REGISTRAR_KEYPAIR_PATH ?? path.join(process.env.LOOKTHROUGH_KEYS_DIR, "registrar.json"));
+
+/** Absolute keys directory for the active profile (.keys on the fork, .keys/devnet on devnet). */
+export function keysDir(): string {
+  return process.env.LOOKTHROUGH_KEYS_DIR as string;
 }
 
-export const dataDir = path.join(root, "apps/web/public/data");
+/** "fork" (surfpool mainnet fork, the default) or "devnet". */
+export function cluster(): "fork" | "devnet" {
+  return process.env.NEXT_PUBLIC_CLUSTER === "devnet" ? "devnet" : "fork";
+}
+
+export const dataDir = process.env.LOOKTHROUGH_DATA_DIR ? path.resolve(root, process.env.LOOKTHROUGH_DATA_DIR) : path.join(root, "apps/web/public/data");
 export const actionsDir = path.join(dataDir, "actions");
 
 export function store(): ActionStore {

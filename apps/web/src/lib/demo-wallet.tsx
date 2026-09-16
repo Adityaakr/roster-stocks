@@ -68,6 +68,12 @@ export function DemoWalletProvider({ children }: { children: ReactNode }) {
       .catch(() => setWallets([]));
   }, []);
 
+  // A browser wallet connecting takes over from the auto-selected demo wallet; picking a demo wallet later is explicit.
+  const pk = publicKey?.toBase58() ?? null;
+  useEffect(() => {
+    if (pk) setSelected(null);
+  }, [pk]);
+
   const value = useMemo<DemoWalletState>(() => {
     const demo = selected ? (wallets.find((w) => w.name === selected) ?? null) : null;
     return {

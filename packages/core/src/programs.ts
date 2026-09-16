@@ -34,3 +34,9 @@ export function knownProgram(id: string | null | undefined): KnownProgram | unde
 export function programLabel(id: string | null | undefined): string {
   return knownProgram(id)?.name ?? "other programs";
 }
+
+/** RPCs that refuse getProgramAccounts on a program (public devnet, keyed free tiers) say so in the error text. */
+export function isGpaRefused(err: unknown): boolean {
+  const m = err instanceof Error ? err.message : String(err);
+  return /excluded from account secondary indexes|not available on the Free tier|getProgramAccounts is not available/i.test(m);
+}

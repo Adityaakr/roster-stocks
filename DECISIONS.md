@@ -19,3 +19,17 @@ Dated log of non-obvious choices, with the alternative rejected.
 ## 2026-09-16
 
 - **tokens.xyz key supplied; schemas follow the live API, not the docs page.** `GET /assets/:id/markets` returns rows with `address`, `name`, `base{address,symbol,decimals}`, `quote{…}`, `liquidity`, `volume24h`, `trade24h` (the docs page says `poolAddress`/`dex`); `price-chart` candles use `time`, not `timestamp`. Schemas stay loose so extra fields pass through. Verified on 2026-09-16 for `apple` and AAPLx: variants AAPLx and AAPLon, both `cash_redeemable`, `tier3`; six markets for AAPLx, the two largest being the Raydium CLMM pools the resolver already looks through.
+
+## 2026-09-16, editorial design system and the assets page
+
+- Replaced the panel-and-chip UI with the editorial system from the design prototype: paper, ink rules, one green and one amber, serif margin notes numbered 01 to 05, mono numbers. Every page is a document with a left margin note and a right content column; this reads as a record, which is what the product produces.
+- Added `/assets` because a visitor could not see what universe Lookthrough applies to. It lists tokens.xyz curated stocks (400) and ETFs (24) with every Solana wrapper, paginated 50 at a time through a server proxy, and pre-IPO tokens from the Tessera and PreStocks public APIs labelled by source. Failed sources are reported next to the ones that loaded, not hidden.
+- Added `/adapters` from `adapterStatusTable()` so the stub list is visible in the product, not only in the README.
+- Frontend work landed on the `bounties` branch history as a separate commit so it can be cherry-picked to `main` without the bounty code.
+
+## 2026-09-16, redesign on the Framer reference, and devnet
+
+- The editorial (paper, serif) system was replaced the same day by the dark institutional system from the user's Framer project, read through the Framer agent CLI: Host Grotesk, near-black ground, elevation surfaces, white primary buttons, pill-labelled sections. Marketing and app are separate route groups so the landing can sell the problem while the app stays a tool with a sidebar.
+- The assets directory became a card grid with an asset page (chart, every wrapper with venues, rights profiles) because a list alone did not show what the product covers. Rights profiles are written only where the source is known (xStock from Backed's terms, PreStocks from the bounty discovery); everything else says "per issuer documentation".
+- Devnet deployment so the user can test with their own wallet. The brief's "fork not devnet" rule still holds for the look-through itself, which cannot exist on devnet; the devnet profile is explicit about that in the snapshot warnings and the UI. Public devnet and Alchemy free tier refuse `getProgramAccounts`, so the resolver gained a labelled `getTokenLargestAccounts` fallback rather than a silent one.
+- The SDK stopped using Anchor's `.rpc()`: it timed out at 30 s on devnet while transactions still landed, which would have desynchronised the action records. The replacement adds a priority fee, polls statuses, re-sends until seen, and only fails after the blockhash expires and a final status check is empty. `publish` and `fund` also recover from a record that missed a landed transaction.
